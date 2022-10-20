@@ -21,8 +21,6 @@ class Kernel extends ConsoleKernel
             Log::info('cron is running');
         })->everyMinute();
 
-
-
     }
 
     /**
