@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Events\UserCreatedEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +62,7 @@ class AuthController extends Controller
                     'email' => $email
                 ], [
                     'name' => $name,
+                    'last_login' => now()
                 ]);
 
                 $token = $user->createToken($email);

@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
     ];
 
@@ -42,4 +43,15 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        static::created(function (User $user) {
+            $user->update([
+                'username' => 'user' . $user->{'id'}
+            ]);
+        });
+
+        parent::boot();
+    }
 }

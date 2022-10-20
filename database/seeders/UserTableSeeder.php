@@ -24,6 +24,5 @@ class UserTableSeeder extends Seeder
         ]);
         $admin->refresh();
         $admin->assignRole(['Admin']);
-        UserCreatedEvent::dispatch($admin);
     }
 }
