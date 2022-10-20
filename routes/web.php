@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/auth/social', [\App\Http\Controllers\AuthController::class, 'redirectToOAuth2Provider']);
+Route::get('/auth/social/callback', [\App\Http\Controllers\AuthController::class, 'oAuth2ProviderCallback']);

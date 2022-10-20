@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
+use App\Classes\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,5 +49,12 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    protected function unauthenticated($request, AuthenticationException $exception): \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response|\Illuminate\Http\RedirectResponse
+    {
+        return $request->expectsJson()
+            ? response()->json(ApiResponse::failedResponse( $exception->getMessage()), 401)
+            : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 }
