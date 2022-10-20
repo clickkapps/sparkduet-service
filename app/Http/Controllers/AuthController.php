@@ -34,8 +34,6 @@ class AuthController extends Controller
 
         try {
 
-            abort(404);
-
             $validator = Validator::make($request->all(), [
                 'provider' => 'required'
             ]);
