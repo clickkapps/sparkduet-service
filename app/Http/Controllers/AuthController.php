@@ -78,7 +78,6 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::info('exception: ' . $e->getMessage());
-            abort(400);
         }
 
     }
