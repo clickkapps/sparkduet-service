@@ -54,5 +54,6 @@ class User extends Authenticatable
         });
 
         parent::boot();
+
     }
 }
