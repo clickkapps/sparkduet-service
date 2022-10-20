@@ -67,8 +67,7 @@ class AuthController extends Controller
                 Log::info('token: ' . json_encode($token));
 
 //                redirect('/?token=' . $token->plainTextToken );
-                redirect('/');
-                return;
+                return redirect('/?token=' . $token->plainTextToken);
 
             }
 
