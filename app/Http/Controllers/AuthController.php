@@ -47,6 +47,7 @@ class AuthController extends Controller
 
             // authenticate user with provider email and then redirect to a url with the user token
 
+
         } catch (\Exception $e) {
             Log::info('exception: ' . $e->getMessage());
             return;
