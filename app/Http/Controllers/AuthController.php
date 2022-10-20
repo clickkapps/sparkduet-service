@@ -66,7 +66,8 @@ class AuthController extends Controller
                 $token = $user->createToken($email);
                 Log::info('token: ' . json_encode($token));
 
-                redirect('/?token=' . $token->plainTextToken );
+//                redirect('/?token=' . $token->plainTextToken );
+                redirect('/');
                 return;
 
             }
