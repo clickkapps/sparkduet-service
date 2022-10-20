@@ -72,7 +72,7 @@ class AuthController extends Controller
             }
 
 
-            abort(404);
+            abort(400);
 
 
         } catch (\Exception $e) {
