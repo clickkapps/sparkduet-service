@@ -34,6 +34,8 @@ class AuthController extends Controller
 
         try {
 
+            abort(404);
+
             $validator = Validator::make($request->all(), [
                 'provider' => 'required'
             ]);
@@ -66,7 +68,6 @@ class AuthController extends Controller
                 $token = $user->createToken($email);
                 Log::info('token: ' . json_encode($token));
 
-//                redirect('/?token=' . $token->plainTextToken );
                 return redirect('/?token=' . $token->plainTextToken);
 
             }
