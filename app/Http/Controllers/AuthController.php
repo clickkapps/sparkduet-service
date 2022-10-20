@@ -62,7 +62,7 @@ class AuthController extends Controller
                     'email' => $email
                 ], [
                     'name' => $name,
-                    'last_login' => now()
+                    'last_login_at' => now()
                 ]);
 
                 $token = $user->createToken($email);
