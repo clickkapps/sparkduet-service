@@ -18,4 +18,4 @@ Route::get('/', function () {
 });
 
 Route::get('/auth/social', [\App\Http\Controllers\AuthController::class, 'redirectToOAuth2Provider']);
-Route::get('/auth/social/callback', [\App\Http\Controllers\AuthController::class, 'oAuth2ProviderCallback']);
+Route::match(['post', 'get'],'/auth/social/callback', [\App\Http\Controllers\AuthController::class, 'oAuth2ProviderCallback']);
