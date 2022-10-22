@@ -17,5 +17,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/auth/social', [\App\Http\Controllers\AuthController::class, 'redirectToOAuth2Provider']);
-Route::match(['post', 'get'],'/auth/social/callback', [\App\Http\Controllers\AuthController::class, 'oAuth2ProviderCallback']);
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('/auth')->group(function () {
+
+    Route::get('/social', [\App\Http\Controllers\AuthController::class, 'redirectToOAuth2Provider']);
+    Route::match(['post', 'get'],'/social/callback', [\App\Http\Controllers\AuthController::class, 'oAuth2ProviderCallback']);
+
+});
+
+
+

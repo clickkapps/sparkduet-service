@@ -14,6 +14,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
+    Route::post('email', [\App\Http\Controllers\UserController::class, 'getUserProfile']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Users Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('user')->middleware('auth:sanctum')->group(function () {
+    Route::get('profile/{id?}', [\App\Http\Controllers\UserController::class, 'getUserProfile']);
 });

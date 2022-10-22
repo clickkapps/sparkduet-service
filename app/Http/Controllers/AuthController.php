@@ -11,6 +11,19 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+
+    public function generateAuthVerificationCode(Request $request) {
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
+        }
+
+    }
+
     public function redirectToOAuth2Provider(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $validator = Validator::make($request->all(), [
