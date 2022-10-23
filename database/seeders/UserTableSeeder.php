@@ -21,6 +21,8 @@ class UserTableSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'clickkapps@gmail.com',
             'password' => Hash::make('0541243508'),
+            'last_login_at' => now(),
+            'email_verified_at' => now()
         ]);
         $admin->refresh();
         $admin->assignRole(['Admin']);

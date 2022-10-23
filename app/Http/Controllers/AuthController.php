@@ -7,6 +7,7 @@ use App\Models\EmailAuthorization;
 use App\Models\User;
 use App\Notifications\EmailAuthCodeGenerated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
@@ -32,22 +33,28 @@ class AuthController extends Controller
             'status' => 'closed'
         ]);
 
+        $code  = generateRandomNumber();
+
         EmailAuthorization::create([
             'email' => $email,
             'status' => 'opened',
+            'code' => Hash::make($code),
             'created_at' => now(),
             'updated_at' => now()
         ]);
 
-        $code  = generateRandomNumber();
+        $parts = explode('@', $email);
+        $name = $parts[0];
+        $user = User::firstOrCreate([
+            'email' => $email
+        ], [
+            'name' => $name,
+        ]); // all emails whose verified at is NULL will be deleted from the system
 
-        $user = new User();
-        $user->{'email'} = $email;
 
         $user->notify((new EmailAuthCodeGenerated($code)));
 
         return response()->json(ApiResponse::successResponse('Verification code sent to ' . $email));
-
 
     }
 
@@ -69,13 +76,22 @@ class AuthController extends Controller
 
         $record = EmailAuthorization::where([
             'email' => $email,
-            'code' => $code,
             'status' => 'opened'
         ])->first();
 
         if(blank($record)){
             return response()->json(ApiResponse::failedResponse('Verification code is invalid'));
         }
+
+        $validCode = Hash::check($code, $record->code);
+
+        if(!$validCode){
+            return response()->json(ApiResponse::failedResponse('Verification code is invalid'));
+        }
+
+        $record->update([
+            'status' => 'closed'
+        ]);
 
         // valid code
         $token = $this->generateAccessTokenFromEmail($email);
@@ -169,10 +185,8 @@ class AuthController extends Controller
             'email' => $email
         ], [
             'name' => $name,
-        ]);
-
-        $user->update([
-            'last_login_at' => now()
+            'last_login_at' => now(),
+            'email_verified_at' => now()
         ]);
 
         $token = $user->createToken($email);

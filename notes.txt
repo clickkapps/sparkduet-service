@@ -1,0 +1,1 @@
+// use cron to delete all users whose email verified_at is NULL
