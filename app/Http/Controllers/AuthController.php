@@ -96,6 +96,7 @@ class AuthController extends Controller
         // valid code
         $token = $this->generateAccessTokenFromEmail($email);
 
+
         return response()->json(ApiResponse::successResponseV2($token));
 
     }
@@ -185,6 +186,11 @@ class AuthController extends Controller
             'email' => $email
         ], [
             'name' => $name,
+            'last_login_at' => now(),
+            'email_verified_at' => now()
+        ]);
+
+        $user->update([
             'last_login_at' => now(),
             'email_verified_at' => now()
         ]);
