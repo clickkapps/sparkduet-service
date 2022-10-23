@@ -16,7 +16,7 @@ class BasicAuth
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return Response|RedirectResponse
      */
-    public function handle(Request $request, Closure $next): Response|RedirectResponse
+    public function handle(Request $request, Closure $next)
     {
         $AUTH_USER = config('custom.basic_auth_username');
         $AUTH_PASS = config('custom.basic_auth_password');

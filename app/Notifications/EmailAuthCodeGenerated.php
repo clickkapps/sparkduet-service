@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EmailAuthCodeGenerated extends Notification
+class EmailAuthCodeGenerated extends Notification implements ShouldQueue
 {
     use Queueable;
     private string $code;

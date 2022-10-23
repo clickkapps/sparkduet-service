@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Models\EmailAuthorization;
 use App\Models\User;
+use App\Notifications\EmailAuthCodeGenerated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,73 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
 
-    public function sendAuthEmailVerificationCode(Request $request) {
+    public function sendAuthEmailVerificationCode(Request $request): \Illuminate\Http\JsonResponse
+    {
 
         $validator = Validator::make($request->all(), [
-            'email' => 'required'
+            'email' => 'required|email'
         ]);
 
         if($validator->fails()) {
             return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
         }
+
+        $email = $request->get('email');
+
+        // close any opened email authorizations
+        EmailAuthorization::where('email','=',$email)->update([
+            'status' => 'closed'
+        ]);
+
+        EmailAuthorization::create([
+            'email' => $email,
+            'status' => 'opened',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        $code  = generateRandomNumber();
+
+        $user = new User();
+        $user->{'email'} = $email;
+
+        $user->notify((new EmailAuthCodeGenerated($code)));
+
+        return response()->json(ApiResponse::successResponse('Verification code sent to ' . $email));
+
 
     }
 
 
-    public function verifyAuthEmail(Request $request) {
+    public function verifyAuthEmail(Request $request): \Illuminate\Http\JsonResponse
+    {
 
         $validator = Validator::make($request->all(), [
-            'code' => 'required'
+            'code' => 'required',
+            'email' => 'required|email'
         ]);
 
         if($validator->fails()) {
             return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
         }
+
+        $email = $request->get('email');
+        $code = $request->get('code');
+
+        $record = EmailAuthorization::where([
+            'email' => $email,
+            'code' => $code,
+            'status' => 'opened'
+        ])->first();
+
+        if(blank($record)){
+            return response()->json(ApiResponse::failedResponse('Verification code is invalid'));
+        }
+
+        // valid code
+        $token = $this->generateAccessTokenFromEmail($email);
+
+        return response()->json(ApiResponse::successResponseV2($token));
 
     }
 
@@ -98,21 +145,10 @@ class AuthController extends Controller
                 abort(400);
             }
 
-            $parts = explode('@', $email);
-            $name = $parts[0];
 
-            // authenticate user with provider email and then redirect to url with the user token
-            $user = User::firstOrCreate([
-                'email' => $email
-            ], [
-                'name' => $name,
-                'last_login_at' => now()
-            ]);
+            $token = $this->generateAccessTokenFromEmail($email);
 
-            $token = $user->createToken($email);
-            Log::info('token: ' . json_encode($token));
-
-            return redirect('/?token=' . $token->plainTextToken);
+            return redirect('/?token=' . $token);
 
 
 
@@ -121,5 +157,27 @@ class AuthController extends Controller
             return redirect('/');
         }
 
+    }
+
+    private function generateAccessTokenFromEmail(string $email) : string {
+
+        $parts = explode('@', $email);
+        $name = $parts[0];
+
+        // authenticate user with provider email and then redirect to url with the user token
+        $user = User::firstOrCreate([
+            'email' => $email
+        ], [
+            'name' => $name,
+        ]);
+
+        $user->update([
+            'last_login_at' => now()
+        ]);
+
+        $token = $user->createToken($email);
+        Log::info('token: ' . json_encode($token));
+
+        return $token->plainTextToken;
     }
 }

@@ -17,23 +17,20 @@ class RestrictIP
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return Response|RedirectResponse
      */
-    public function handle(Request $request, Closure $next): Response|RedirectResponse
+    public function handle(Request $request, Closure $next)
     {
-        if (!isLocal()) {
+        Log::info('incoming request header: ' . json_encode($request->header()));
+        Log::info('incoming request body: ' . json_encode($request->all()));
+        Log::info('incoming request IP: ' . json_encode($request->ip()));
 
-            Log::info('incoming request header: ' . json_encode($request->header()));
-            Log::info('incoming request body: ' . json_encode($request->all()));
-            Log::info('incoming request IP: ' . json_encode($request->ip()));
-
-            $countryCode = ip_info("Visitor", "Country Code"); // IN
-            if ( $countryCode != null && $countryCode != 'NL' && $countryCode != 'GH' && $countryCode != 'CA') {
-                // allow only request from the countries in the condition above
-                Log::info('IP rejected: :' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
-                exit;
-            }
-
-            Log::info('IP accepted: ' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
+        $countryCode = ip_info("Visitor", "Country Code"); // IN
+        if ( $countryCode != null && $countryCode != 'NL' && $countryCode != 'GH' && $countryCode != 'CA') {
+            // allow only request from the countries in the condition above
+            Log::info('IP rejected: :' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
+            exit;
         }
+
+        Log::info('IP accepted: ' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
 
         return $next($request);
     }

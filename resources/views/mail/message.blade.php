@@ -1,11 +1,11 @@
 @component('mail::message')
 
-#Dear {{$user->name}}
+{{$user->name ? 'Dear ' . $user->name : 'Hello,'}}
 <br>
 <p>{{$message}}</p>
 <br>
 
 Thanks,<br>
-{{ config('app.name') }}
+{{ config('app.name') . ' Team '}}
 
 @endcomponent
