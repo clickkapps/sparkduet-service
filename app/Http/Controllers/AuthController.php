@@ -12,10 +12,23 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
 
-    public function generateAuthVerificationCode(Request $request) {
+    public function sendAuthEmailVerificationCode(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
+        }
+
+    }
+
+
+    public function verifyAuthEmail(Request $request) {
+
+        $validator = Validator::make($request->all(), [
+            'code' => 'required'
         ]);
 
         if($validator->fails()) {

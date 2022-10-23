@@ -19,8 +19,9 @@ use Illuminate\Support\Facades\Route;
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
-    Route::post('email', [\App\Http\Controllers\UserController::class, 'getUserProfile']);
+Route::prefix('auth')->middleware('basicAuth')->group(function () {
+    Route::post('email', [\App\Http\Controllers\AuthController::class, 'sendAuthEmailVerificationCode']);
+    Route::post('email/verify', [\App\Http\Controllers\AuthController::class, 'verifyAuthEmail']);
 });
 
 
