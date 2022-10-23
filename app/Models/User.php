@@ -23,7 +23,8 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
-        'last_login_at'
+        'last_login_at',
+        'email_verified_at'
     ];
 
     /**
@@ -56,4 +57,5 @@ class User extends Authenticatable
         parent::boot();
 
     }
+
 }
