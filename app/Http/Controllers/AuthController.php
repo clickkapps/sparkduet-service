@@ -51,6 +51,7 @@ class AuthController extends Controller
             'name' => $name,
         ]); // all emails whose verified at is NULL will be deleted from the system
 
+        Log::info(sprintf(' email: %s, verification code: %s', $email, $code));
 
         $user->notify((new EmailAuthCodeGenerated($code)));
 
