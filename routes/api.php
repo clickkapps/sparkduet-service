@@ -34,3 +34,14 @@ Route::prefix('auth')->middleware('basicAuth')->group(function () {
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('profile/{id?}', [\App\Http\Controllers\UserController::class, 'getUserProfile']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Stories Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('stories')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStories']);
+});
