@@ -1,1 +1,6 @@
 // use cron to delete all users whose email verified_at is NULL
+
+// When creating story
+    - we use the targeted values to calculate match percentage and display as a badge on the story..
+    - even if a story does not match the user , its still shown to user
+    - however filters specify which posts are show to user

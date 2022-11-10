@@ -5,20 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserInfo extends Model
+class FilterCountry extends Model
 {
     use HasFactory;
+    protected $table = 'filter_countries';
 
     protected $fillable = [
-        'user_id',
-        'description',
-        'dob',
-        'gender',
-        'city',
-        'country',
-        'profile_pic'
+        'filter_id',
+        'country_id'
     ];
-
-
 
 }

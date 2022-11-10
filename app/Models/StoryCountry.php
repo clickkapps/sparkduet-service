@@ -5,20 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserInfo extends Model
+class StoryCountry extends Model
 {
     use HasFactory;
+    protected $table = 'story_countries';
 
     protected $fillable = [
-        'user_id',
-        'description',
-        'dob',
-        'gender',
-        'city',
-        'country',
-        'profile_pic'
+        'story_id',
+        'country_id'
     ];
-
-
-
 }

@@ -43,5 +43,37 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 */
 
 Route::prefix('stories')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStories']);
+    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
+    Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createStory']);
+
+    // actions
+    Route::post('/like/{storyId}', [\App\Http\Controllers\StoryController::class, 'likeStory']);
+    Route::post('/bookmark/{storyId}', [\App\Http\Controllers\StoryController::class, 'bookmarkStory']);
+    Route::post('/view/{storyId}', [\App\Http\Controllers\StoryController::class, 'viewStory']);
+    Route::post('/report/{storyId}', [\App\Http\Controllers\StoryController::class, 'reportStory']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Comments Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
+//    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
+    Route::post('/create', [\App\Http\Controllers\CommentController::class, 'createComment']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Filters Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('filters')->middleware('auth:sanctum')->group(function () {
+//    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
+    Route::post('/update', [\App\Http\Controllers\FilterController::class, 'setFilter']);
+    Route::get('/', [\App\Http\Controllers\FilterController::class, 'getFilter']);
 });
