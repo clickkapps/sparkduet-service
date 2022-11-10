@@ -198,6 +198,8 @@ class StoryController extends Controller
                 $name = pathinfo($path)['basename'];
                 $url  = Storage::url($path);
 
+                Log::info('full url ' . $url);
+
                 $uploadedFiles[] = [
                     'path' => $url,
                     'size' => $size,
