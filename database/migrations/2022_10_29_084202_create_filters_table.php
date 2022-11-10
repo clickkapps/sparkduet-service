@@ -13,15 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_infos', function (Blueprint $table) {
+        Schema::create('filters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('description')->nullable()->default(null);
-            $table->dateTime('dob')->nullable()->default(null);
+            $table->string('min_age')->nullable()->default(null);
+            $table->string('max_age')->nullable()->default(null);
             $table->string('gender')->nullable()->default(null);
-            $table->string('city')->nullable()->default(null);
-            $table->string('country')->nullable()->default(null);
-            $table->text('profile_pic')->nullable()->default(null);
+            $table->string('countries_option')->nullable()->default(null)->comment('all / only / except');
             $table->timestamps();
         });
     }
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_info');
+        Schema::dropIfExists('filters');
     }
 };

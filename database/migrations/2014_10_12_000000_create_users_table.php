@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable()->default(null);
             $table->dateTime('last_login_at')->nullable()->default(null);
+            $table->boolean('blocked')->nullable()->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

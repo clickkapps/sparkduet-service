@@ -24,7 +24,8 @@ class User extends Authenticatable
         'username',
         'password',
         'last_login_at',
-        'email_verified_at'
+        'email_verified_at',
+        'blocked'
     ];
 
     /**
@@ -61,6 +62,11 @@ class User extends Authenticatable
     public function info(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(UserInfo::class);
+    }
+
+    public function filter(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Filter::class);
     }
 
 }
