@@ -69,7 +69,7 @@ class StoryController extends Controller
         }
 
 
-//        $query->inRandomOrder();
+        $query->inRandomOrder();
 
         /// calculate match percentage
 
@@ -197,8 +197,6 @@ class StoryController extends Controller
                 $type = Storage::mimeType($path);
                 $name = pathinfo($path)['basename'];
                 $url  = Storage::url($path);
-
-                Log::info('full url ' . $url);
 
                 $uploadedFiles[] = [
                     'path' => $url,
