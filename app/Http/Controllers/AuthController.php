@@ -59,7 +59,6 @@ class AuthController extends Controller
 
     }
 
-
     public function verifyAuthEmail(Request $request): \Illuminate\Http\JsonResponse
     {
 
