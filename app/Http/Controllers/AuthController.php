@@ -120,7 +120,8 @@ class AuthController extends Controller
         }else if ($provider == 'apple') {
 
 //            https://socialiteproviders.com/Apple/#installation-basic-usage
-            return Socialite::driver("apple")->redirect();
+//            return Socialite::driver("apple")->redirect();
+                return Socialite::driver('apple')->redirect();
         }
 
         return response()->json(ApiResponse::failedResponse('Invalid provider'));
