@@ -112,12 +112,15 @@ class AuthController extends Controller
         }
 
         $provider = $request->get('provider');
+
         if($provider == "google") {
+
             return Socialite::driver('google')->redirect();
+
         }else if ($provider == 'apple') {
-            return Socialite::driver("sign-in-with-apple")
-                ->scopes(["name", "email"])
-                ->redirect();
+
+//            https://socialiteproviders.com/Apple/#installation-basic-usage
+            return Socialite::driver("apple")->redirect();
         }
 
         return response()->json(ApiResponse::failedResponse('Invalid provider'));
@@ -143,13 +146,14 @@ class AuthController extends Controller
             $email = null;
 
             if($provider == 'google') {
-                $user = Socialite::driver('google')->user();
+                $user = Socialite::driver('google')->stateless()->user();
                 Log::info('returned google user: ' . json_encode($user));
                 $email = $user->getEmail();
 
             }else if ($provider == 'apple') {
                 // get abstract user object, not persisted
                 $user = Socialite::driver("sign-in-with-apple")
+                    ->stateless()
                     ->user();
                 Log::info('returned apple user: ' . json_encode($user));
                 $email = $user->getEmail();
@@ -171,7 +175,7 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::info('exception: ' . $e->getMessage());
-            return redirect('/');
+            return redirect('/?error='. $e->getMessage());
         }
 
     }
