@@ -153,7 +153,7 @@ class AuthController extends Controller
 
             }else if ($provider == 'apple') {
                 // get abstract user object, not persisted
-                $user = Socialite::driver("sign-in-with-apple")
+                $user = Socialite::driver("apple")
                     ->stateless()
                     ->user();
                 Log::info('returned apple user: ' . json_encode($user));
