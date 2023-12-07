@@ -17,9 +17,6 @@ class UserController extends Controller
         }
 
         $user = User::find($userId);
-//        if($user->info) {
-//
-//        }
 
 //        return response()->json(ApiResponse::successResponseV2($user));
         return response()->json(ApiResponse::successResponseV2($user));

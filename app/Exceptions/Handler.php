@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use App\Classes\ApiResponse;
+use App\Classes\AppResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Throwable;
 
 use Illuminate\Auth\AuthenticationException;
@@ -46,8 +48,14 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (Throwable $exception) {
+        });
+
+        $this->renderable(function (\Exception $e, Request $request) {
+
+            if ($request->is('api/*') || $request->is('*/api/*')  || $request->is('stripe/webhook')) {
+                return response()->json(ApiResponse::failedResponse($e->getMessage()));
+            }
         });
     }
 

@@ -43,6 +43,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 */
 
 Route::prefix('stories')->middleware('auth:sanctum')->group(function () {
+
     Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
     Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createStory']);
 
