@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2.12",
-        "cloudinary-labs/cloudinary-laravel": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel-notification-channels/telegram": "^2.1",
         "laravel/framework": "^9.19",
