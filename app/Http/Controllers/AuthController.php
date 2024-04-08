@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Jobs\SetUserLocationInfo;
 use App\Models\EmailAuthorization;
 use App\Models\User;
+use App\Models\UserInfo;
 use App\Notifications\EmailAuthCodeGenerated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -73,6 +75,8 @@ class AuthController extends Controller
 
         $email = $request->get('email');
         $code = $request->get('code');
+        // Get the user's IP address
+        $userIp = $request->ip();
 
         $record = EmailAuthorization::where([
             'email' => $email,
@@ -94,7 +98,7 @@ class AuthController extends Controller
         ]);
 
         // valid code
-        $token = $this->generateAccessTokenFromEmail($email);
+        $token = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
 
 
         return response()->json(ApiResponse::successResponseV2($token));
@@ -119,6 +123,7 @@ class AuthController extends Controller
 
         }else if ($provider == 'apple') {
 
+//            https://github.com/mikebronner/laravel-sign-in-with-apple for apple configuration
 //            https://socialiteproviders.com/Apple/#installation-basic-usage
 //            return Socialite::driver("apple")->redirect();
                 return Socialite::driver('apple')->redirect();
@@ -142,6 +147,8 @@ class AuthController extends Controller
                 abort(400);
             }
 
+            // Get the user's IP address
+            $userIp = $request->ip();
             $provider = $request->get('provider');
 
             $email = null;
@@ -168,7 +175,7 @@ class AuthController extends Controller
             }
 
 
-            $token = $this->generateAccessTokenFromEmail($email);
+            $token = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
 
             return redirect('/?token=' . $token);
 
@@ -181,24 +188,31 @@ class AuthController extends Controller
 
     }
 
-    private function generateAccessTokenFromEmail(string $email) : string {
+    private function generateAccessTokenFromEmail(string $userIp, string $email) : string {
 
         $parts = explode('@', $email);
         $name = $parts[0];
 
         // authenticate user with provider email and then redirect to url with the user token
-        $user = User::firstOrCreate([
+        $user = User::with([])->firstOrCreate([
             'email' => $email
         ], [
             'name' => $name,
             'last_login_at' => now(),
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
         ]);
 
         $user->update([
             'last_login_at' => now(),
             'email_verified_at' => now()
         ]);
+
+        $userInfo = UserInfo::with([])->firstOrCreate(
+            ['user_id' => $user->{'id'}],
+            []
+        );
+
+        SetUserLocationInfo::dispatch($userInfo, $userIp);
 
         $token = $user->createToken($email);
         Log::info('token: ' . json_encode($token));

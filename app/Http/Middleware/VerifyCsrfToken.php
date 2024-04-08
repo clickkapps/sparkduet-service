@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'https://sparkduet.com/auth/social/callback?provider=apple',
+        'https://api.sparkduet.com/auth/social/callback?provider=apple',
     ];
 }

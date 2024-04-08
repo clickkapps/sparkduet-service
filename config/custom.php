@@ -15,5 +15,6 @@ return [
 //    'sms_api_key' => env('SMS_API_KEY', null),
 //
     'telegram_channel_id' => env('TELEGRAM_CHAT_ID',null),
+    'ipinfo_api_key' => env('IPINFO_API_KEY',null),
 
 ];

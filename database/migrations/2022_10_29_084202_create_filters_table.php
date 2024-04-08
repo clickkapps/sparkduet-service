@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('max_age')->nullable()->default(null);
             $table->string('gender')->nullable()->default(null);
             $table->string('countries_option')->nullable()->default(null)->comment('all / only / except');
+            $table->string('countries_filtered')->nullable()->default(null)->comment('GH / US / etc');
             $table->timestamps();
         });
     }

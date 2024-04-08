@@ -16,7 +16,7 @@ class UserController extends Controller
             $userId = $id;
         }
 
-        $user = User::find($userId);
+        $user = User::with(['info'])->find($userId);
 
 //        return response()->json(ApiResponse::successResponseV2($user));
         return response()->json(ApiResponse::successResponseV2($user));

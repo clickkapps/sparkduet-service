@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('password')->nullable()->default(null);
             $table->dateTime('last_login_at')->nullable()->default(null);
             $table->boolean('blocked')->nullable()->default(false);
+            $table->timestamp('deleted_at')->nullable()->default(null);
             $table->rememberToken();
             $table->timestamps();
         });

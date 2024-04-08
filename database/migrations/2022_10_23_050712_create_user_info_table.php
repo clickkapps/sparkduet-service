@@ -16,12 +16,17 @@ return new class extends Migration
         Schema::create('user_infos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('description')->nullable()->default(null);
+            $table->text('bio')->nullable()->default("Hey, I am on the lookout for a partner. Interested in exploring the journey of finding love together?");
             $table->dateTime('dob')->nullable()->default(null);
+            $table->integer('age')->nullable()->default(null);
             $table->string('gender')->nullable()->default(null);
             $table->string('city')->nullable()->default(null);
             $table->string('country')->nullable()->default(null);
-            $table->text('profile_pic')->nullable()->default(null);
+            $table->string('region')->nullable()->default(null);
+            $table->string('loc')->nullable()->default(null);
+            $table->string('timezone')->nullable()->default(null);
+            $table->string('profile_pic_path')->nullable()->default(null);
+            $table->string('introductory_video_path')->nullable()->default(null);
             $table->timestamps();
         });
     }

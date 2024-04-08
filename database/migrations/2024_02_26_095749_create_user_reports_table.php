@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('story_countries', function (Blueprint $table) {
+        Schema::create('user_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('story_id')->constrained('stories');
-            $table->foreignId('country_id')->constrained('countries');
+            $table->foreignId('offender_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
+            $table->text('reason')->nullable()->default(null);
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('story_countries');
+        Schema::dropIfExists('user_reports');
     }
 };

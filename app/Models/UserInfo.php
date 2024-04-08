@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 
 class UserInfo extends Model
 {
@@ -11,13 +12,22 @@ class UserInfo extends Model
 
     protected $fillable = [
         'user_id',
-        'description',
+        'bio',
         'dob',
         'gender',
         'city',
         'country',
-        'profile_pic'
+        'region',
+        'loc',
+        'timezone',
+        'profile_pic_path',
+        'introductory_video_path',
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
 
