@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('user_infos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->text('bio')->nullable()->default("Hey, I am on the lookout for a partner. Interested in exploring the journey of finding love together?");
+            $table->text('bio')->nullable();
             $table->dateTime('dob')->nullable()->default(null);
             $table->integer('age')->nullable()->default(null);
             $table->string('gender')->nullable()->default(null);
