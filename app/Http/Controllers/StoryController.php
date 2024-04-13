@@ -92,7 +92,7 @@ class StoryController extends Controller
             return $mappedStory;
         });
 
-        return response()->json(ApiResponse::successResponseV2($stories));
+        return response()->json(ApiResponse::successResponseWithData($stories));
     }
 
     public function createStory(Request $request): \Illuminate\Http\JsonResponse
@@ -220,7 +220,7 @@ class StoryController extends Controller
 
             $story = Story::with('media')->where(['id' => $story->id])->first();
 
-            return response()->json(ApiResponse::successResponseV2($story));
+            return response()->json(ApiResponse::successResponseWithData($story));
 
 
         }catch (\Exception $e) {

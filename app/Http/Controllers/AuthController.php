@@ -101,7 +101,7 @@ class AuthController extends Controller
         $token = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
 
 
-        return response()->json(ApiResponse::successResponseV2($token));
+        return response()->json(ApiResponse::successResponseWithData($token));
 
     }
 

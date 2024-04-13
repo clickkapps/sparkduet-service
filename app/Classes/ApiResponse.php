@@ -27,7 +27,7 @@ class ApiResponse
         return new ApiResponse(true,$message,$extra);
     }
 
-    #[Pure] static public function successResponseV2($extra = null, $message = "SUCCESS"): ApiResponse
+    #[Pure] static public function successResponseWithData($extra = null, $message = "SUCCESS"): ApiResponse
     {
         return new ApiResponse(true,$message,$extra);
     }
