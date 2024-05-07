@@ -26,7 +26,6 @@ return new class extends Migration
             $table->string('loc')->nullable()->default(null);
             $table->string('timezone')->nullable()->default(null);
             $table->string('profile_pic_path')->nullable()->default(null);
-            $table->string('introductory_video_path')->nullable()->default(null);
             $table->timestamps();
         });
     }

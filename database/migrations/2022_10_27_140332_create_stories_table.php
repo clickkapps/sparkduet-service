@@ -17,17 +17,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->text('description')->nullable()->default(null);
-            $table->boolean('comments_enabled')->nullable()->default(false);
-            $table->dateTime('expiry_date')->nullable()->default(null)->comment("when a story expires it won't show in feeds, but will be on user profile ");
-            $table->string('targeted_countries_option')->nullable()->default('all')->comment('all / only / except');
-            $table->boolean('blocked_by_admin')->nullable()->default(false);
+            $table->boolean('comments_disabled_at')->nullable()->default(null);
+            $table->dateTime('blocked_by_admin_at')->nullable()->default(null);
             $table->string('media_path');
-            $table->string('media_type');
-            $table->string('city')->nullable()->default(null);
-            $table->string('country')->nullable()->default(null);
-            $table->string('region')->nullable()->default(null);
-            $table->string('loc')->nullable()->default(null);
-            $table->string('timezone')->nullable()->default(null);
+            $table->string('media_type')->comment("image/video");
+            $table->string('purpose')->nullable()->default(null)->comment("introduction/previousRelationship/expectations/career");
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -37,7 +32,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('stories');
     }

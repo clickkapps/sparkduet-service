@@ -12,25 +12,13 @@ class Story extends Model
 
     protected $fillable = [
         'user_id',
-        'targeted_gender', // male // female / any
-        'targeted_min_age',
-        'targeted_max_age',
         'description',
-        'feed_expiry_date',
-        'targeted_countries_option',  // all / except / only
-        'blocked',
-        'comments_enabled'
+        'comments_disabled_at',
+        'blocked_by_admin_at',
+        'media_path',
+        'media_type',
+        'purpose'
     ];
-
-    public function media(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Media::class);
-    }
-
-    public function countries(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(Country::class, StoryCountry::class);
-    }
 
     public function likes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

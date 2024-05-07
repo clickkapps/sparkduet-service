@@ -44,8 +44,9 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('stories')->middleware('auth:sanctum')->group(function () {
 
-    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
-    Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createStory']);
+    Route::get('/feeds', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
+    Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createFeed']);
+    Route::post('/update/{id}', [\App\Http\Controllers\StoryController::class, 'updateFeed']);
 
     // actions
     Route::post('/like/{storyId}', [\App\Http\Controllers\StoryController::class, 'likeStory']);

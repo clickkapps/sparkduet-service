@@ -64,9 +64,5 @@ class User extends Authenticatable
         return $this->hasOne(UserInfo::class);
     }
 
-    public function filter(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Filter::class);
-    }
 
 }
