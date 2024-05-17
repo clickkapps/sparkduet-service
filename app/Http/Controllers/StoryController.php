@@ -48,10 +48,11 @@ class StoryController extends Controller
         $user = $request->user();
 
         $query = Story::with([])
+            ->where("user_id", "!=", $user->id)
             ->withCount(['likes', 'views'])
             ->where('blocked_by_admin_at', '=', null);
 
-        $stories = $query->simplePaginate()->through(function ($story, $key) use ($user){
+        $stories = $query->simplePaginate(3)->through(function ($story, $key) use ($user){
             return $story;
         });
 
@@ -62,10 +63,10 @@ class StoryController extends Controller
             /// This prompts the user to create post
             $merged = $updatedItems->concat([
                 [ 'id' => -1 ], /// Introductory video
-                [ 'id' => -2 ], /// Expectations in your next relationship
-                [ 'id' => -3 ], /// Previous relationship
-                [ 'id' => -4 ], /// Talk about your career
-                [ 'id' => -5 ], /// Your take on stay-home spouse
+//                [ 'id' => -2 ], /// Expectations in your next relationship
+//                [ 'id' => -3 ], /// Previous relationship
+//                [ 'id' => -4 ], /// Talk about your career
+//                [ 'id' => -5 ], /// Your take on stay-home spouse
             ]);
 
             $stories->setCollection($merged);
@@ -74,6 +75,28 @@ class StoryController extends Controller
 
 
         return response()->json(ApiResponse::successResponseWithData($stories));
+    }
+
+    public function fetchUserPosts($userId) : \Illuminate\Http\JsonResponse {
+
+        $query = Story::with([])
+            ->where(["user_id" => $userId])
+            ->withCount(['likes', 'views'])
+            ->where('blocked_by_admin_at', '=', null);
+        $posts = $query->simplePaginate(3);
+
+        return response()->json(ApiResponse::successResponseWithData($posts));
+    }
+
+    public function fetchUserBookmarkedPosts($userId) : \Illuminate\Http\JsonResponse {
+
+        $query = Story::with([])
+            ->where(["user_id" => $userId])
+            ->withCount(['likes', 'views'])
+            ->where('blocked_by_admin_at', '=', null);
+        $posts = $query->simplePaginate(3);
+
+        return response()->json(ApiResponse::successResponseWithData($posts));
     }
 
     public function createFeed(Request $request): \Illuminate\Http\JsonResponse
@@ -97,7 +120,7 @@ class StoryController extends Controller
         $description = $request->get('description');
         $commentsDisabled = $request->get("comments_disabled");
 
-        $story = Story::with([])->create([
+        $story = Story::with(['user'])->create([
             'user_id' => $user->id,
             'description' => $description,
             'comments_disabled_at' => $commentsDisabled ? now() : null,

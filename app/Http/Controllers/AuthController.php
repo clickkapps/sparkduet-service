@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponse;
 use App\Jobs\SetUserLocationInfo;
 use App\Models\EmailAuthorization;
+use App\Models\Story;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Notifications\EmailAuthCodeGenerated;
+use App\Traits\UserTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +19,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+    use UserTrait;
 
     public function sendAuthEmailVerificationCode(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -209,7 +213,7 @@ class AuthController extends Controller
 
         $userInfo = UserInfo::with([])->firstOrCreate(
             ['user_id' => $user->{'id'}],
-            ['bio' => "Hey, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"]
+            ['bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"]
         );
 
         SetUserLocationInfo::dispatch($userInfo, $userIp);
@@ -219,4 +223,101 @@ class AuthController extends Controller
 
         return $token->plainTextToken;
     }
+
+
+    public function updateAuthUserProfile(Request $request): JsonResponse {
+
+        $user = $request->user();
+
+        $basicInfoPayload = [];
+
+        if($request->has("name")) {
+            $basicInfoPayload["name"] = $request->get("name");
+        }
+
+        if(!empty($basicInfoPayload)) {
+            User::with([])->find($user->id)->update($basicInfoPayload);
+        }
+
+        // user filters / personal preferences
+        $additionalInfoPayload = [];
+
+        if($request->has("bio")) {
+            $additionalInfoPayload["bio"] = $request->get("bio");
+        }
+        if($request->has("age")) {
+            $additionalInfoPayload["age"] = $request->get("age");
+            $additionalInfoPayload["age_at"] = today();
+        }
+        if($request->has("gender")) {
+            $additionalInfoPayload["gender"] = $request->get("gender");
+        }
+        if($request->has("profilePhoto")) {
+            $additionalInfoPayload["profile_pic_path"] = $request->get("profilePhoto");
+        }
+
+        if($request->has("preferred_gender")){
+            $additionalInfoPayload["preferred_gender"] = $request->get("preferred_gender");
+        }
+        if($request->has("preferred_min_age")){
+            $additionalInfoPayload["preferred_min_age"] = $request->get("preferred_min_age");
+        }
+        if(!$request->has("preferred_max_age")){
+            $additionalInfoPayload["preferred_max_age"] = $request->get("preferred_max_age");
+        }
+        if($request->has("preferred_races")){
+            $additionalInfoPayload["preferred_races"] = $request->get("preferred_races");
+        }
+        if($request->has("preferred_nationalities")){
+            $additionalInfoPayload["preferred_nationalities"] = $request->get("preferred_nationalities");
+        }
+
+        if(!empty($additionalInfoPayload)) {
+            UserInfo::with([])->where(["user_id" => $user->id ])->update($additionalInfoPayload);
+        }
+
+        return $this->getUserProfile($request);
+
+    }
+
+    // We want to prompt users to update their basic info
+    public function shouldPromptAuthUserToUpdateBasicInfo(Request $request): JsonResponse {
+
+        $user = $request->user();
+
+        $userInfo = UserInfo::with([])
+            ->where(["user_id" => $user->id])
+            ->first();
+
+        // check if we have already requested user to
+        if($userInfo->{"requested_profile_update"}) {
+            return response()->json(ApiResponse::successResponseWithData(false));
+        }
+
+        // check if the user has introductory video and has not been prompted yet, then prompt
+        $introductoryPost = Story::with([])->where([
+            "user_id" => $user->{"id"},
+            "purpose" => "introduction"
+        ])->first();
+
+        if(blank($introductoryPost)) {
+            return response()->json(ApiResponse::successResponseWithData(false));
+        }
+
+        // okay prompt
+        return response()->json(ApiResponse::successResponseWithData(true));
+
+    }
+
+    // once we prompt... we need to update the db that the user has been prompted. We perhaps we don't prompt again
+    public function setPromptBasicInfoCompleted(Request $request): JsonResponse
+    {
+
+        $user = $request->user();
+        UserInfo::with([])->where(["user_id" => $user->id])
+            ->update(['requested_profile_update' => now()]);
+
+        return response()->json(ApiResponse::successResponse());
+    }
+
 }

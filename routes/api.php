@@ -23,6 +23,11 @@ Route::prefix('auth')->middleware('basicAuth')->group(function () {
     Route::post('email', [\App\Http\Controllers\AuthController::class, 'sendAuthEmailVerificationCode']);
     Route::post('email/verify', [\App\Http\Controllers\AuthController::class, 'verifyAuthEmail']);
 });
+Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
+    Route::post('profile-update', [\App\Http\Controllers\AuthController::class, 'updateAuthUserProfile']);
+    Route::get('should-prompt-basic-info-update', [\App\Http\Controllers\AuthController::class, 'shouldPromptAuthUserToUpdateBasicInfo']);
+    Route::get('basic-info-prompted', [\App\Http\Controllers\AuthController::class, 'setPromptBasicInfoCompleted']);
+});
 
 
 /*
@@ -42,17 +47,21 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('stories')->middleware('auth:sanctum')->group(function () {
+Route::prefix('posts')->middleware('auth:sanctum')->group(function () {
 
-    Route::get('/feeds', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
+    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
     Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createFeed']);
     Route::post('/update/{id}', [\App\Http\Controllers\StoryController::class, 'updateFeed']);
 
+    // User posts
+    Route::get('/user/{userId}', [\App\Http\Controllers\StoryController::class, 'fetchUserPosts']);
+    Route::get('/bookmarked/user/{userId}', [\App\Http\Controllers\StoryController::class, 'fetchUserBookmarkedPosts']);
+
     // actions
-    Route::post('/like/{storyId}', [\App\Http\Controllers\StoryController::class, 'likeStory']);
-    Route::post('/bookmark/{storyId}', [\App\Http\Controllers\StoryController::class, 'bookmarkStory']);
-    Route::post('/view/{storyId}', [\App\Http\Controllers\StoryController::class, 'viewStory']);
-    Route::post('/report/{storyId}', [\App\Http\Controllers\StoryController::class, 'reportStory']);
+    Route::post('/like/{postId}', [\App\Http\Controllers\StoryController::class, 'likeStory']);
+    Route::post('/bookmark/{postId}', [\App\Http\Controllers\StoryController::class, 'bookmarkStory']);
+    Route::post('/view/{postId}', [\App\Http\Controllers\StoryController::class, 'viewStory']);
+    Route::post('/report/{postId}', [\App\Http\Controllers\StoryController::class, 'reportStory']);
 });
 
 
@@ -70,12 +79,10 @@ Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Filters Routes
+| Utils Routes
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('filters')->middleware('auth:sanctum')->group(function () {
-//    Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
-    Route::post('/update', [\App\Http\Controllers\FilterController::class, 'setFilter']);
-    Route::get('/', [\App\Http\Controllers\FilterController::class, 'getFilter']);
+Route::prefix('utils')->middleware('auth:sanctum')->group(function () {
+    Route::post('upload-files', [\App\Http\Controllers\UtilsController::class, 'uploadFiles']);
 });

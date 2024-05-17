@@ -51,7 +51,7 @@ class User extends Authenticatable
     {
         static::created(function (User $user) {
             $user->update([
-                'username' => 'user' . $user->{'id'}
+                'username' => $user->{'name'} . $user->{'id'}
             ]);
         });
 

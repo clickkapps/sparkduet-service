@@ -14,6 +14,7 @@ class UserInfo extends Model
         'user_id',
         'bio',
         'dob',
+        'age',
         'gender',
         'city',
         'country',
@@ -22,6 +23,8 @@ class UserInfo extends Model
         'timezone',
         'profile_pic_path',
         'introductory_video_path',
+        'requested_profile_update',
+        "age_at"
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
