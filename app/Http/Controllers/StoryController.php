@@ -117,6 +117,7 @@ class StoryController extends Controller
         $purpose = $request->get("purpose");
         $mediaPath= $request->get("media_path");
         $mediaType= $request->get("media_type");
+        $assetId = $request->get("asset_id");
         $description = $request->get('description');
         $commentsDisabled = $request->get("comments_disabled");
 
@@ -127,6 +128,7 @@ class StoryController extends Controller
             'blocked_by_admin_at' => null,
             'media_path' => $mediaPath,
             'media_type' => $mediaType,
+            'asset_id' => $assetId,
             'purpose' => $purpose ?: "notApplicable"
         ]);
 

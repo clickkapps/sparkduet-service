@@ -17,6 +17,7 @@ class Story extends Model
         'blocked_by_admin_at',
         'media_path',
         'media_type',
+        'asset_id',
         'purpose'
     ];
 
