@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use MuxPhp\Api\AssetsApi;
 use MuxPhp\ApiException;
 use MuxPhp\Configuration;
 use MuxPhp\Api\DirectUploadsApi;
@@ -41,7 +42,7 @@ class UtilsController extends Controller
         return response()->json(ApiResponse::successResponseWithData($paths));
     }
 
-    private function getMuxDirectUploadInstance() : DirectUploadsApi {
+    private function getMuxConfiguration(): Configuration {
         $muxTokenId = config('custom.mux_token_id_dev');
         $muxTokenSecret = config('custom.mux_token_secret_dev');
 
@@ -50,10 +51,14 @@ class UtilsController extends Controller
 
 
         // Authentication Setup
-        $config = Configuration::getDefaultConfiguration()
+        return Configuration::getDefaultConfiguration()
             ->setUsername($muxTokenId)
             ->setPassword($muxTokenSecret);
 
+    }
+    private function getMuxDirectUploadInstance() : DirectUploadsApi {
+
+        $config = $this->getMuxConfiguration();
         return new DirectUploadsApi(
             new Client(),
             $config
@@ -63,7 +68,7 @@ class UtilsController extends Controller
     /**
      * @throws ApiException
      */
-    public function createMuxUploadUrl(Request $request): \Illuminate\Http\JsonResponse
+    public function createMuxUploadUrl(): \Illuminate\Http\JsonResponse
     {
 
         $appUrl = config('app.url');
@@ -84,7 +89,8 @@ class UtilsController extends Controller
      * @throws ValidationException
      * @throws ApiException
      */
-    public function getMuxVideoStatus(Request $request): \Illuminate\Http\JsonResponse {
+    public function getMuxUploadStatus(Request $request): \Illuminate\Http\JsonResponse
+    {
 
         $this->validate($request, [
             'videoId' => 'required'
@@ -96,6 +102,32 @@ class UtilsController extends Controller
 
 
         $result = $uploadInstance->getDirectUpload($videoId);
+
+        return response()->json(ApiResponse::successResponseWithData($result));
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws ApiException
+     */
+    public function getMuxVideoStatus(Request $request): \Illuminate\Http\JsonResponse {
+
+        $this->validate($request, [
+            'assetId' => 'required'
+        ]);
+
+        $assetId = $request->get('assetId');
+        $config = $this->getMuxConfiguration();
+
+
+        $apiInstance = new AssetsApi(
+        // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+        // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+
+        $result = $apiInstance->getAsset($assetId);
         return response()->json(ApiResponse::successResponseWithData($result));
 
     }
