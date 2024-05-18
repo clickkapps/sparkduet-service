@@ -18,5 +18,7 @@ return [
     'ipinfo_api_key' => env('IPINFO_API_KEY',null),
     'mux_token_id' => env('MUX_TOKEN_ID',null),
     'mux_token_secret' => env('MUX_TOKEN_SECRET',null),
+    'mux_token_id_dev' => env('MUX_TOKEN_ID_DEV',null),
+    'mux_token_secret_dev' => env('MUX_TOKEN_SECRET_DEV',null),
 
 ];

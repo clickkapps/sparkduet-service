@@ -43,8 +43,8 @@ class UtilsController extends Controller
 
     public function getMuxUploadUrl(Request $request): \Illuminate\Http\JsonResponse
     {
-        $muxTokenId = config('custom.mux_token_id');
-        $muxTokenSecret = config('custom.mux_token_secret');
+        $muxTokenId = config('custom.mux_token_id_dev');
+        $muxTokenSecret = config('custom.mux_token_secret_dev');
         $appUrl = config('app.url');
 
         Log::info("muxTokenId: $muxTokenId");
