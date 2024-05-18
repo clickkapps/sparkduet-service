@@ -85,4 +85,5 @@ Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('utils')->middleware('auth:sanctum')->group(function () {
     Route::post('upload-files', [\App\Http\Controllers\UtilsController::class, 'uploadFiles']);
+    Route::post('mux-upload-url', [\App\Http\Controllers\UtilsController::class, 'getMuxUploadUrl']);
 });

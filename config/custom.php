@@ -16,5 +16,7 @@ return [
 //
     'telegram_channel_id' => env('TELEGRAM_CHAT_ID',null),
     'ipinfo_api_key' => env('IPINFO_API_KEY',null),
+    'mux_token_id' => env('MUX_TOKEN_ID',null),
+    'mux_token_secret' => env('MUX_TOKEN_SECRET',null),
 
 ];
