@@ -86,5 +86,5 @@ Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
 Route::prefix('utils')->middleware('auth:sanctum')->group(function () {
     Route::post('upload-files', [\App\Http\Controllers\UtilsController::class, 'uploadFiles']);
     Route::get('mux-upload-url', [\App\Http\Controllers\UtilsController::class, 'createMuxUploadUrl']);
-    Route::get('mux-upload-status', [\App\Http\Controllers\UtilsController::class, 'getMuxVideoStatus']);
+    Route::post('mux-upload-status', [\App\Http\Controllers\UtilsController::class, 'getMuxVideoStatus']);
 });
