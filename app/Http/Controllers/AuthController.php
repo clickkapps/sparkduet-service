@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
-use App\Jobs\SetUserLocationInfo;
 use App\Models\EmailAuthorization;
 use App\Models\Story;
 use App\Models\User;
