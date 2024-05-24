@@ -24,7 +24,14 @@ class UserInfo extends Model
         'profile_pic_path',
         'introductory_video_path',
         'requested_profile_update',
-        "age_at"
+        "age_at",
+        'race',
+
+        'preferred_gender',
+        'preferred_min_age',
+        'preferred_max_age',
+        'preferred_races',
+        'preferred_nationalities',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

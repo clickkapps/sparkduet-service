@@ -18,7 +18,8 @@ class Story extends Model
         'media_path',
         'media_type',
         'asset_id',
-        'purpose'
+        'purpose',
+        'aspect_ratio'
     ];
 
     public function likes(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -71,14 +71,14 @@ class UtilsController extends Controller
     public function createMuxUploadUrl(): \Illuminate\Http\JsonResponse
     {
 
-        $appUrl = config('app.url');
-        Log::info("appUrl: $appUrl");
+        $crossOrigin = config('app.env') == "local" ? "*" : config('app.url');
+        Log::info("appUrl: $crossOrigin");
 
         $uploadInstance = $this->getMuxDirectUploadInstance();
 
 
         $createAssetRequest = new CreateAssetRequest(["playback_policy" => [PlaybackPolicy::_PUBLIC], "encoding_tier" => "baseline"]);
-        $createUploadRequest = new CreateUploadRequest(["timeout" => 3600, "new_asset_settings" => $createAssetRequest, "cors_origin" => $appUrl]);
+        $createUploadRequest = new CreateUploadRequest(["timeout" => 3600, "new_asset_settings" => $createAssetRequest, "cors_origin" => $crossOrigin]);
 
         $upload = $uploadInstance->createDirectUpload($createUploadRequest);
 

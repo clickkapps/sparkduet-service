@@ -213,10 +213,15 @@ class AuthController extends Controller
 
         $userInfo = UserInfo::with([])->firstOrCreate(
             ['user_id' => $user->{'id'}],
-            ['bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"]
+            [
+              'bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"
+            ]
         );
 
-        SetUserLocationInfo::dispatch($userInfo, $userIp);
+        // We need to this so we can fetch stories narrowed in the users country
+        if(blank($userInfo->{"preferred_nationalities"})){
+            $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
+        }
 
         $token = $user->createToken($email);
         Log::info('token: ' . json_encode($token));
@@ -255,6 +260,9 @@ class AuthController extends Controller
         if($request->has("profilePhoto")) {
             $additionalInfoPayload["profile_pic_path"] = $request->get("profilePhoto");
         }
+        if($request->has("race")) {
+            $additionalInfoPayload["race"] = $request->get("race");
+        }
 
         if($request->has("preferred_gender")){
             $additionalInfoPayload["preferred_gender"] = $request->get("preferred_gender");
@@ -262,7 +270,7 @@ class AuthController extends Controller
         if($request->has("preferred_min_age")){
             $additionalInfoPayload["preferred_min_age"] = $request->get("preferred_min_age");
         }
-        if(!$request->has("preferred_max_age")){
+        if($request->has("preferred_max_age")){
             $additionalInfoPayload["preferred_max_age"] = $request->get("preferred_max_age");
         }
         if($request->has("preferred_races")){

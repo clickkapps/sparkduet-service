@@ -50,7 +50,8 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 Route::prefix('posts')->middleware('auth:sanctum')->group(function () {
 
     Route::get('/', [\App\Http\Controllers\StoryController::class, 'fetchStoryFeeds']);
-    Route::post('/create', [\App\Http\Controllers\StoryController::class, 'createFeed']);
+    Route::post('/create-post', [\App\Http\Controllers\StoryController::class, 'createPost']);
+    Route::post('/attach-post-media/{id}', [\App\Http\Controllers\StoryController::class, 'attachMediaToPost']);
     Route::post('/update/{id}', [\App\Http\Controllers\StoryController::class, 'updateFeed']);
 
     // User posts

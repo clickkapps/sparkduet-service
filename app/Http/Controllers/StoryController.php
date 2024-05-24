@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponse;
 use App\Models\Story;
 use App\Models\User;
+use App\Traits\UserTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Validator;
 
 class StoryController extends Controller
 {
+
+    use UserTrait;
 
     //! Private functions
     private function toggleStoryTable(Builder $table, $storyId, User $user) {
@@ -42,13 +45,18 @@ class StoryController extends Controller
         }
     }
 
+//    [ 'id' => -2 ], /// Expectations in your next relationship
+////                [ 'id' => -3 ], /// Previous relationship
+////                [ 'id' => -4 ], /// Talk about your career
+////                [ 'id' => -5 ], /// Your take on stay-home spouse
     //! Public functions
     public function fetchStoryFeeds(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
 
-        $query = Story::with([])
+        $query = Story::with(['user'])
             ->where("user_id", "!=", $user->id)
+            ->where('media_path', '!=', "")
             ->withCount(['likes', 'views'])
             ->where('blocked_by_admin_at', '=', null);
 
@@ -57,33 +65,67 @@ class StoryController extends Controller
         });
 
         $updatedItems = $stories->getCollection();
+        $merged = $updatedItems;
 
         if($updatedItems->isEmpty()) {
 
             /// This prompts the user to create post
-            $merged = $updatedItems->concat([
-                [ 'id' => -1 ], /// Introductory video
-//                [ 'id' => -2 ], /// Expectations in your next relationship
-//                [ 'id' => -3 ], /// Previous relationship
-//                [ 'id' => -4 ], /// Talk about your career
-//                [ 'id' => -5 ], /// Your take on stay-home spouse
-            ]);
+            $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
 
-            $stories->setCollection($merged);
+            if(blank($introductoryPost)) {
+                $merged = $updatedItems->concat([
+                    [ 'id' => -1 ], /// Introductory video
+                ]);
+            }else {
+                $expectationPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "expectations"])->first();
+                if(blank($expectationPost)) {
+                    $merged = $updatedItems->concat([
+                        [ 'id' => -2 ], /// Introductory video
+                    ]);
+                }else {
+                    $previousRelationshipPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "previousRelationship"])->first();
+                        if(blank($previousRelationshipPost)) {
+                            $merged = $updatedItems->concat([
+                                [ 'id' => -3 ], /// Introductory video
+                        ]);
+                    }else {
+                            $careerPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
+                            if(blank($careerPost)) {
+                                $merged = $updatedItems->concat([
+                                    ['id' => -4], /// Introductory video
+                                ]);
+                            }else {
+                                $otherPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
+                                if(blank($otherPost)) {
+                                    $merged = $updatedItems->concat([
+                                        ['id' => -5], /// Introductory video
+                                    ]);
+                                }
+                            }
+                        }
+                }
+            }
+
+        }else {
+
+
 
         }
+
+        $stories->setCollection($merged);
 
 
         return response()->json(ApiResponse::successResponseWithData($stories));
     }
 
-    public function fetchUserPosts($userId) : \Illuminate\Http\JsonResponse {
+    public function fetchUserPosts($userId, Request $request) : \Illuminate\Http\JsonResponse {
 
-        $query = Story::with([])
+        $query = Story::with(['user'])
             ->where(["user_id" => $userId])
             ->withCount(['likes', 'views'])
+            ->orderByDesc("created_at")
             ->where('blocked_by_admin_at', '=', null);
-        $posts = $query->simplePaginate(3);
+        $posts = $query->simplePaginate($request->get("limit") ?: 9);
 
         return response()->json(ApiResponse::successResponseWithData($posts));
     }
@@ -99,29 +141,29 @@ class StoryController extends Controller
         return response()->json(ApiResponse::successResponseWithData($posts));
     }
 
-    public function createFeed(Request $request): \Illuminate\Http\JsonResponse
+    //! Feed creation process:
+    // 1. initiate feed to get recordId
+    // 2. send media to media platform
+    // 3. update feed with media link
+
+//    public function initiateCreateFeed(Request $request){
+//        $user = $request->user();
+//    }
+
+    public function createPost(Request $request): \Illuminate\Http\JsonResponse
     {
 
         $user = $request->user();
         // if user is blocked, user cannot post a story
 
-        $validator = Validator::make($request->all(), [
-            'media_path' => 'required',
-            'media_type' => 'required',
-        ]);
-
-        if($validator->fails()){
-            return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
-        }
-
         $purpose = $request->get("purpose");
-        $mediaPath= $request->get("media_path");
-        $mediaType= $request->get("media_type");
-        $assetId = $request->get("asset_id");
+        $mediaPath= $request->get("media_path") ?: "";
+        $mediaType= $request->get("media_type") ?: "";
+        $assetId = $request->get("asset_id") ?: "";
         $description = $request->get('description');
         $commentsDisabled = $request->get("comments_disabled");
 
-        $story = Story::with(['user'])->create([
+        $post = Story::with(['user'])->create([
             'user_id' => $user->id,
             'description' => $description,
             'comments_disabled_at' => $commentsDisabled ? now() : null,
@@ -132,7 +174,41 @@ class StoryController extends Controller
             'purpose' => $purpose ?: "notApplicable"
         ]);
 
-        return response()->json(ApiResponse::successResponseWithData($story));
+        return response()->json(ApiResponse::successResponseWithData($post));
+
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function attachMediaToPost($id, Request $request): \Illuminate\Http\JsonResponse
+    {
+
+        $post = Story::with(['user'])->find($id);
+        if(blank($post)){
+            throw new \Exception("Post not found");
+        }
+
+        $validator = Validator::make($request->all(), [
+            'media_path' => 'required',
+            'media_type' => 'required',
+//            'asset_id' => 'required',
+//            'aspect_ratio' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
+        }
+
+        $post->update([
+            'media_path' => $request->get("media_path"),
+            'media_type' => $request->get("media_type"),
+            'asset_id' => $request->get("asset_id"),
+            'aspect_ratio' => $request->get("aspect_ratio"),
+        ]);
+        $post->refresh();
+
+        return response()->json(ApiResponse::successResponseWithData($post));
 
     }
 
@@ -144,7 +220,7 @@ class StoryController extends Controller
         $description = $request->get('description');
         $commentsDisabled = $request->get("comments_disabled");
 
-        $story = Story::with([])->find($id)->update([
+        $story = Story::with(['user'])->find($id)->update([
             'description' => $description,
             'comments_disabled_at' => $commentsDisabled ? now() : null,
             'media_path' => $mediaPath,
