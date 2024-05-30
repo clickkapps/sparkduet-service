@@ -43,8 +43,8 @@ class UtilsController extends Controller
     }
 
     private function getMuxConfiguration(): Configuration {
-        $muxTokenId = config('custom.mux_token_id_dev');
-        $muxTokenSecret = config('custom.mux_token_secret_dev');
+        $muxTokenId = config('custom.mux_token_id');
+        $muxTokenSecret = config('custom.mux_token_secret');
 
         Log::info("muxTokenId: $muxTokenId");
         Log::info("muxTokenSecret: $muxTokenSecret");
