@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class StoryReport extends Model
 {
     use HasFactory;
+    protected $fillable = [
+      'user_id',
+      'story_id',
+      'reason'
+    ];
 }

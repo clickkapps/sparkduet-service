@@ -4,3 +4,12 @@
     - we use the targeted values to calculate match percentage and display as a badge on the story..
     - even if a story does not match the user , its still shown to user
     - however filters specify which posts are show to user
+
+
+// at regular interval, we count the number of people who liked your post and send you a push notification
+// at regular interval, we count the number of people who viewed your posts and send you a push notification
+// at regular interval, we count the number of people who viewed your profile and send you a push notification
+
+
+// at regular interval, we check if the user you're following has created new posts and send you notifications
+

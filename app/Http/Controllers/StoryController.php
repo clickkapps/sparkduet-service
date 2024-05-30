@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
 use App\Models\Story;
+use App\Models\StoryBookmark;
+use App\Models\StoryLike;
+use App\Models\StoryReport;
+use App\Models\StoryView;
 use App\Models\User;
 use App\Traits\UserTrait;
-use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class StoryController extends Controller
@@ -53,19 +54,27 @@ class StoryController extends Controller
     public function fetchStoryFeeds(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-
-        $query = Story::with(['user'])
+        $query = Story::with(['user.info'])
             ->where("user_id", "!=", $user->id)
             ->where('media_path', '!=', "")
-            ->withCount(['likes', 'views'])
             ->where('blocked_by_admin_at', '=', null);
 
         $stories = $query->simplePaginate(3)->through(function ($story, $key) use ($user){
             return $story;
         });
 
-        $updatedItems = $stories->getCollection();
-        $merged = $updatedItems;
+//        $updatedItems = $stories->getCollection();
+//        // Add bookmark status to each story
+//        $updatedItems->each(function ($story) use ($user) {
+//            $story->user_has_bookmarked = $story->isBookmarkedByUser($user->{'id'});
+//            $story->story_likes_by_user = $story->getStoryLikesByUser($user->{'id'});
+//            $story->user_view_info = $story->viewInfo($user->{'id'});
+//        });
+
+
+        $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
+
+        $merged = $updatedItems->getCollection();
 
         if($updatedItems->isEmpty()) {
 
@@ -118,37 +127,50 @@ class StoryController extends Controller
         return response()->json(ApiResponse::successResponseWithData($stories));
     }
 
-    public function fetchUserPosts($userId, Request $request) : \Illuminate\Http\JsonResponse {
+    public function fetchUserPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
+
 
         $query = Story::with(['user'])
             ->where(["user_id" => $userId])
             ->withCount(['likes', 'views'])
             ->orderByDesc("created_at")
             ->where('blocked_by_admin_at', '=', null);
+
         $posts = $query->simplePaginate($request->get("limit") ?: 9);
 
-        return response()->json(ApiResponse::successResponseWithData($posts));
-    }
-
-    public function fetchUserBookmarkedPosts($userId) : \Illuminate\Http\JsonResponse {
-
-        $query = Story::with([])
-            ->where(["user_id" => $userId])
-            ->withCount(['likes', 'views'])
-            ->where('blocked_by_admin_at', '=', null);
-        $posts = $query->simplePaginate(3);
+        $posts = $this->setAdditionalFeedParameters($request, $posts);
 
         return response()->json(ApiResponse::successResponseWithData($posts));
     }
 
-    //! Feed creation process:
-    // 1. initiate feed to get recordId
-    // 2. send media to media platform
-    // 3. update feed with media link
+    private function  setAdditionalFeedParameters(Request $request, $feeds)
+    {
+        $authUser = $request->user();
+        $updatedItems = $feeds->getCollection();
+        // Add bookmark status to each story
+        $updatedItems->each(function ($story) use ($authUser) {
+            $story->user_has_bookmarked = $story->isBookmarkedByUser($authUser->{'id'});
+            $story->story_likes_by_user = $story->getStoryLikesByUser($authUser->{'id'});
+            $story->user_view_info = $story->viewInfo($authUser->{'id'});
+        });
+        $feeds->setCollection($updatedItems);
+        return $feeds;
+    }
 
-//    public function initiateCreateFeed(Request $request){
-//        $user = $request->user();
-//    }
+    public function fetchUserBookmarkedPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
+
+        $query = User::with('bookmarkedStories.user.info')
+            ->where('id', $userId)
+            ->first()
+            ->bookmarkedStories();
+
+        $posts = $query->simplePaginate($request->get("limit") ?: 9);
+
+        $posts = $this->setAdditionalFeedParameters($request, $posts);
+
+        return response()->json(ApiResponse::successResponseWithData($posts));
+    }
+
 
     public function createPost(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -233,21 +255,38 @@ class StoryController extends Controller
 
 
     // this system allows multiple likes
-    public function likeStory(Request $request, $storyId): \Illuminate\Http\JsonResponse
+    public function likeStory(Request $request, $postId): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'action' => 'add'
+            'action' => 'required'
         ]);
 
         if($validator->fails()) {
             return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
         }
 
-        $table = DB::table('story_likes');
+        $action = $request->get('action');
+        $record = StoryLike::with([])->firstOrCreate(
+            [
+                'user_id' => $user->{'id'},
+                'story_id' => $postId
+            ],
+            []
+        );
+        if($action == 'add') {
 
-        $this->toggleStoryTable($table, $storyId, $user);
+            $record->update([
+                'count' => ($record->{'count'} ?? 0) + 1
+            ]);
+        }else {
+            // remove
+            $record->update([
+                'count' => 0
+            ]);
+        }
+
 
         return response()->json(ApiResponse::successResponse());
 
@@ -266,22 +305,55 @@ class StoryController extends Controller
 
     }
 
-    public function viewStory(Request $request, $storyId): \Illuminate\Http\JsonResponse
+    public function viewStory(Request $request, $postId): \Illuminate\Http\JsonResponse
     {
 
+        $validator = Validator::make($request->all(), [
+            'action' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json(ApiResponse::failedResponse($validator->errors()->first()));
+        }
+
         $user = $request->user();
+        $action = $request->get('action');
 
-        $table = DB::table('story_views');
+        if (!in_array($action, ['seen', 'watched'])) {
+            return response()->json(ApiResponse::failedResponse("Invalid request"));
+        }
 
-        $this->toggleStoryTable($table, $storyId, $user);
+        $record = StoryView::with([])->firstOrCreate(
+            [
+                'user_id' => $user->{'id'},
+                'story_id' => $postId
+            ],
+            []
+        );
+
+        $now = now();
+        if($action == 'seen') {
+            $record->update([
+                "seen_at" => $now
+            ]);
+        }else {
+            $payload = [];
+            if(blank($record->{'watched_created_at'})){
+                $payload['watched_created_at'] = $now;
+            }
+            $payload['watched_updated_at'] = $now;
+            $payload['watched_count'] = ($record->{'watched_count'} ?? 0) + 1;
+
+            $record->update($payload);
+        }
 
         return response()->json(ApiResponse::successResponse());
 
     }
 
-    public function reportStory(Request $request, $storyId): \Illuminate\Http\JsonResponse
+
+    public function reportStory(Request $request, $postId): \Illuminate\Http\JsonResponse
     {
-        $user = $request->user();
 
         $validator = Validator::make($request->all(), [
            'reason' => 'required'
@@ -291,14 +363,13 @@ class StoryController extends Controller
             return response()->json(ApiResponse::failedResponse('state the reason for reporting'));
         }
 
+        $user = $request->user();
         $reason = $request->get('reason');
 
-        DB::table('story_reports')->insert([
+        StoryReport::with([])->create([
             'user_id' => $user->id,
-            'story_id' => $storyId,
+            'story_id' => $postId,
             'reason' => $reason,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         return response()->json(ApiResponse::successResponse());

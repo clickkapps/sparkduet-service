@@ -90,3 +90,16 @@ Route::prefix('utils')->middleware('auth:sanctum')->group(function () {
     Route::post('mux-upload-status', [\App\Http\Controllers\UtilsController::class, 'getMuxUploadStatus']);
     Route::post('mux-video-status', [\App\Http\Controllers\UtilsController::class, 'getMuxVideoStatus']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Search Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('search')->middleware('auth:sanctum')->group(function () {
+    Route::get('top', [\App\Http\Controllers\SearchController::class, 'searchTopResults']);
+    Route::get('users', [\App\Http\Controllers\SearchController::class, 'searchPeople']);
+    Route::get('posts', [\App\Http\Controllers\SearchController::class, 'searchStories']);
+    Route::post('add-search-term', [\App\Http\Controllers\SearchController::class, 'addSearchTerm']);
+    Route::get('get-search-terms', [\App\Http\Controllers\SearchController::class, 'getSearchTerm']);
+});
