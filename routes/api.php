@@ -101,5 +101,6 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
     Route::get('users', [\App\Http\Controllers\SearchController::class, 'searchPeople']);
     Route::get('posts', [\App\Http\Controllers\SearchController::class, 'searchStories']);
     Route::post('add-search-term', [\App\Http\Controllers\SearchController::class, 'addSearchTerm']);
-    Route::get('get-search-terms', [\App\Http\Controllers\SearchController::class, 'getSearchTerm']);
+    Route::get('user-search-terms', [\App\Http\Controllers\SearchController::class, 'getUserSearchTerms']);
+    Route::get('popular-search-terms', [\App\Http\Controllers\SearchController::class, 'popularSearches']);
 });
