@@ -8,40 +8,59 @@ use App\Models\User;
 use App\Models\UserInfo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 trait UserTrait
 {
     public function getUserProfile(Request $request, $id = null): \Illuminate\Http\JsonResponse
     {
         // if userId is null get the authenticated user profile
-        $userId = $request->user()->id;
+        $user = $request->user();
+        $userId = $user->id;
 
         if(!blank($id)){
             $userId = $id;
+        }else{
+            // currently loggedIn user is the only one who can update user and userInfo
+            $updateUserPayload = [];
+            if(blank($user->{'public_key'})) {
+                $updateUserPayload['public_key'] = Str::uuid();
+            }
+
+            if(!empty($updateUserPayload)) {
+                $user->update($updateUserPayload);
+            }
+
+            //! All other user updates that weren't added during sign up
+            $updateUserInfoPayload = [];
+            $userInfo = UserInfo::with([])->where(['user_id' => $userId])->first();
+
+            if(blank($userInfo->{'preferred_gender'})) {
+                $updateUserInfoPayload["preferred_gender"] = json_encode(["any"]);
+            }
+            if(blank($userInfo->{'preferred_min_age'})) {
+                $updateUserInfoPayload["preferred_min_age"] = "18";
+            }
+            if(blank($userInfo->{'preferred_max_age'})) {
+                $updateUserInfoPayload["preferred_max_age"] = "70";
+            }
+            if(blank($userInfo->{'preferred_races'})) {
+                $updateUserInfoPayload["preferred_races"] = json_encode(["any"]);
+            }
+
+            if(!empty($updateUserInfoPayload)) {
+                $userInfo->update($updateUserInfoPayload);
+            }
+
+            if(blank($userInfo->{"preferred_nationalities"})){
+                $userIp = $request->ip();
+                $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
+            }
         }
 
-        //! All other user updates that weren't added during sign up
-        $updateUserInfoPayload = [];
-        $userInfo = UserInfo::with([])->where(['user_id' => $userId])->first();
-
-        if(blank($userInfo->{'preferred_gender'})) {
-            $updateUserInfoPayload["preferred_gender"] = json_encode(["any"]);
-        }
-        if(blank($userInfo->{'preferred_min_age'})) {
-            $updateUserInfoPayload["preferred_min_age"] = "18";
-        }
-        if(blank($userInfo->{'preferred_max_age'})) {
-            $updateUserInfoPayload["preferred_max_age"] = "70";
-        }
-        if(blank($userInfo->{'preferred_races'})) {
-            $updateUserInfoPayload["preferred_races"] = json_encode(["any"]);
-        }
-
-        if(!empty($updateUserInfoPayload)) {
-            $userInfo->update($updateUserInfoPayload);
-        }
 
         $user = User::with(['info'])->find($userId);
         $introductoryStory = Story::with([])->where([
@@ -64,11 +83,11 @@ trait UserTrait
             }
         }
 
-        if(blank($userInfo->{"preferred_nationalities"})){
-            $userIp = $request->ip();
-            $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
+        // if its not from auth user
+        if(!blank($id)) {
+            // Hide fields you don't want to include in the JSON response
+            $user->makeHidden(['first_login_at', 'public_key', 'last_login_at']);
         }
-
 //        return response()->json(ApiResponse::successResponseV2($user));
         return response()->json(ApiResponse::successResponseWithData($user));
 

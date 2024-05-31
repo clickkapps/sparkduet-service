@@ -7,6 +7,7 @@ use App\Classes\ApiResponse;
 use App\Models\Story;
 use App\Models\User;
 use App\Models\UserSearch;
+use App\Traits\StoryTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class SearchController extends Controller
 {
+    use StoryTrait;
     /***/
     /**
      * @throws ValidationException
@@ -28,8 +30,15 @@ class SearchController extends Controller
         ]);
         $terms = $request->get("terms") ?: "";
 
-        $users = User::search($terms)->get();
-        $stories = Story::search($terms)->get();
+        $users = User::search($terms)
+            ->query(fn ($query) => $query->with('info'))
+            ->simplePaginate(5);
+
+        $stories = Story::search($terms)
+            ->query(fn ($query) => $query->with('user.info'))
+            ->simplePaginate(5);
+        $stories = $this->setAdditionalFeedParameters($request, $stories);
+
         UserSearch::with([])->create([
             'user_id' => $user->{'id'},
             'query' => $terms,
@@ -51,8 +60,13 @@ class SearchController extends Controller
 
         $terms = $request->get("terms");
 
-        $users = Story::search(''.$terms)->simplePaginate($request->get("limit") ?: 15);
-        return response()->json(ApiResponse::successResponseWithData($users));
+        $stories = Story::search(''.$terms)
+            ->query(fn ($query) => $query->with('user.info'))
+            ->simplePaginate($request->get("limit") ?: 15);
+
+        $stories = $this->setAdditionalFeedParameters($request, $stories);
+
+        return response()->json(ApiResponse::successResponseWithData($stories));
     }
 
     /**
@@ -66,7 +80,9 @@ class SearchController extends Controller
 
         $terms = $request->get("terms") ?: "";
 
-        $users = User::search(''.$terms)->simplePaginate($request->get("limit") ?: 15);
+        $users = User::search(''.$terms)
+            ->query(fn ($query) => $query->with('info'))
+            ->simplePaginate($request->get("limit") ?: 15);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 

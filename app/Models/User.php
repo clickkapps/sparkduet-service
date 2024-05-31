@@ -25,8 +25,10 @@ class User extends Authenticatable
         'username',
         'password',
         'last_login_at',
+        'first_login_at',
         'email_verified_at',
-        'blocked'
+        'blocked',
+        'public_key'
     ];
 
     /**

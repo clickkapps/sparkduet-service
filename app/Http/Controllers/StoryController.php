@@ -9,6 +9,7 @@ use App\Models\StoryLike;
 use App\Models\StoryReport;
 use App\Models\StoryView;
 use App\Models\User;
+use App\Traits\StoryTrait;
 use App\Traits\UserTrait;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Validator;
 class StoryController extends Controller
 {
 
-    use UserTrait;
+    use UserTrait, StoryTrait;
 
     //! Private functions
     private function toggleStoryTable(Builder $table, $storyId, User $user) {
@@ -143,28 +144,15 @@ class StoryController extends Controller
         return response()->json(ApiResponse::successResponseWithData($posts));
     }
 
-    private function  setAdditionalFeedParameters(Request $request, $feeds)
-    {
-        $authUser = $request->user();
-        $updatedItems = $feeds->getCollection();
-        // Add bookmark status to each story
-        $updatedItems->each(function ($story) use ($authUser) {
-            $story->user_has_bookmarked = $story->isBookmarkedByUser($authUser->{'id'});
-            $story->story_likes_by_user = $story->getStoryLikesByUser($authUser->{'id'});
-            $story->user_view_info = $story->viewInfo($authUser->{'id'});
-        });
-        $feeds->setCollection($updatedItems);
-        return $feeds;
-    }
+
 
     public function fetchUserBookmarkedPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
 
-        $query = User::with('bookmarkedStories.user.info')
-            ->where('id', $userId)
-            ->first()
-            ->bookmarkedStories();
+        // Fetch the user with relationships
+        $user = User::with(['bookmarkedStories.user.info'])->findOrFail($userId);
 
-        $posts = $query->simplePaginate($request->get("limit") ?: 9);
+        // Get the paginated bookmarked stories
+        $posts = $user->bookmarkedStories()->simplePaginate($request->get("limit") ?: 9); // Adjust the per-page limit as needed
 
         $posts = $this->setAdditionalFeedParameters($request, $posts);
 

@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -48,17 +49,17 @@ class AuthController extends Controller
             'updated_at' => now()
         ]);
 
-        $parts = explode('@', $email);
-        $name = $parts[0];
-        $user = User::firstOrCreate([
-            'email' => $email
-        ], [
-            'name' => $name,
-        ]); // all emails whose verified at is NULL will be deleted from the system
+//        $parts = explode('@', $email);
+//        $name = $parts[0];
+//        $user = User::firstOrCreate([
+//            'email' => $email
+//        ], [
+//            'name' => $name,
+//        ]); // all emails whose verified at is NULL will be deleted from the system
 
         Log::info(sprintf(' email: %s, verification code: %s', $email, $code));
 
-        $user->notify((new EmailAuthCodeGenerated($code)));
+        Notification::route('mail', $email)->notify(new EmailAuthCodeGenerated($code));
 
         return response()->json(ApiResponse::successResponse('Verification code sent to ' . $email));
 
@@ -197,18 +198,24 @@ class AuthController extends Controller
         $name = $parts[0];
 
         // authenticate user with provider email and then redirect to url with the user token
-        $user = User::with([])->firstOrCreate([
-            'email' => $email
-        ], [
-            'name' => $name,
-            'last_login_at' => now(),
-            'email_verified_at' => now(),
-        ]);
+        $now = now();
 
-        $user->update([
-            'last_login_at' => now(),
-            'email_verified_at' => now()
-        ]);
+        $user = User::with([])->where('email', $email)->first();
+        if(blank($user)) {
+            // sign up --------
+             $user = User::with([])->create([
+                'email' => $email,
+                'name' => $name,
+                'last_login_at' => $now,
+                'email_verified_at' => $now,
+                'first_login_at' => $now
+            ]);
+        }else {
+            $user->update([
+                'last_login_at' => $now,
+                'email_verified_at' => $now
+            ]);
+        }
 
         $userInfo = UserInfo::with([])->firstOrCreate(
             ['user_id' => $user->{'id'}],
