@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -233,6 +234,17 @@ class AuthController extends Controller
         Log::info('token: ' . json_encode($token));
 
         return $token->plainTextToken;
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function setChatId(Request $request) {
+        $this->validate($request, [
+            'chat_id' => null
+        ]);
+        $user = $request->user();
+        $user->update(['chat_id' => $request->get('chat_id')]);
     }
 
 

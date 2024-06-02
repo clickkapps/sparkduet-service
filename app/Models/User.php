@@ -28,7 +28,8 @@ class User extends Authenticatable
         'first_login_at',
         'email_verified_at',
         'blocked',
-        'public_key'
+        'public_key',
+        'chat_id'
     ];
 
     /**
