@@ -49,8 +49,8 @@ class AuthController extends Controller
             'updated_at' => now()
         ]);
 
-//        $parts = explode('@', $email);
-//        $name = $parts[0];
+        $parts = explode('@', $email);
+        $name = $parts[0];
 //        $user = User::firstOrCreate([
 //            'email' => $email
 //        ], [
@@ -59,7 +59,7 @@ class AuthController extends Controller
 
         Log::info(sprintf(' email: %s, verification code: %s', $email, $code));
 
-        Notification::route('mail', $email)->notify(new EmailAuthCodeGenerated($code));
+        Notification::route('mail', $email)->notify(new EmailAuthCodeGenerated($code,$name));
 
         return response()->json(ApiResponse::successResponse('Verification code sent to ' . $email));
 

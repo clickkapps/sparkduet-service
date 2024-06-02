@@ -1,6 +1,6 @@
 @component('mail::message')
 
-{{$user->name ? 'Dear ' . $user->name : 'Hello,'}}
+{{$name ? 'Dear ' . $name : 'Hello,'}}
 <br>
 <p>{{$message}}</p>
 <br>

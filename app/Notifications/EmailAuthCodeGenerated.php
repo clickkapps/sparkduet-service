@@ -11,15 +11,17 @@ class EmailAuthCodeGenerated extends Notification implements ShouldQueue
 {
     use Queueable;
     private string $code;
+    private string $name;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(string $code)
+    public function __construct(string $code, string $name)
     {
         $this->code = $code;
+        $this->name = $name;
     }
 
     /**
@@ -49,7 +51,7 @@ class EmailAuthCodeGenerated extends Notification implements ShouldQueue
             ->markdown('mail.message',
                 [
                     'message' => $message,
-                    'user' => $notifiable
+                    'name' => $this->name
                 ]
             );
     }
