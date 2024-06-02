@@ -27,7 +27,6 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
     Route::post('profile-update', [\App\Http\Controllers\AuthController::class, 'updateAuthUserProfile']);
     Route::get('should-prompt-basic-info-update', [\App\Http\Controllers\AuthController::class, 'shouldPromptAuthUserToUpdateBasicInfo']);
     Route::get('basic-info-prompted', [\App\Http\Controllers\AuthController::class, 'setPromptBasicInfoCompleted']);
-    Route::post('set-chat-id', [\App\Http\Controllers\AuthController::class, 'setChatId']);
 });
 
 

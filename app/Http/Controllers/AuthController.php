@@ -236,18 +236,6 @@ class AuthController extends Controller
         return $token->plainTextToken;
     }
 
-    /**
-     * @throws ValidationException
-     */
-    public function setChatId(Request $request) {
-        $this->validate($request, [
-            'chat_id' => null
-        ]);
-        $user = $request->user();
-        $user->update(['chat_id' => $request->get('chat_id')]);
-    }
-
-
     public function updateAuthUserProfile(Request $request): JsonResponse {
 
         $user = $request->user();
@@ -256,6 +244,10 @@ class AuthController extends Controller
 
         if($request->has("name")) {
             $basicInfoPayload["name"] = $request->get("name");
+        }
+
+        if($request->has("chat_id")) {
+            $basicInfoPayload["chat_id"] = $request->get("chat_id");
         }
 
         if(!empty($basicInfoPayload)) {
