@@ -15,7 +15,7 @@ class ChatController extends Controller
     public function fetchSuggestedChats(Request $request): \Illuminate\Http\JsonResponse
     {
         $authUser = $request->user();
-        $suggestedUsers = User::with(['info'])->where('user_id', '!=', $authUser->{'id'})->get();
+        $suggestedUsers = User::with(['info'])->where('id', '!=', $authUser->{'id'})->get();
 
         $users = $suggestedUsers->map(function ($user) use ($authUser) {
             $user = $this->attachUserComputedAge($user);
