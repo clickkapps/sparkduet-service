@@ -43,12 +43,24 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Users Routes
+| Chats Routes
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::get('suggested', [\App\Http\Controllers\ChatController::class, 'fetchSuggestedChats']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Preferences Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('preferences')->middleware('auth:sanctum')->group(function () {
+    Route::get('/settings', [\App\Http\Controllers\PreferencesController::class, 'fetchSettings']);
+    Route::post('/update-settings', [\App\Http\Controllers\PreferencesController::class, 'updateSettings']);
+    Route::post('/create-feedback', [\App\Http\Controllers\PreferencesController::class, 'createFeedback']);
 });
 
 
