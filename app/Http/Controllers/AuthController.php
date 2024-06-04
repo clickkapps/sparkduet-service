@@ -8,6 +8,7 @@ use App\Models\Story;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Notifications\EmailAuthCodeGenerated;
+use App\Services\FirebaseService;
 use App\Traits\UserTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,12 +16,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
+use JetBrains\PhpStorm\ArrayShape;
+use Kreait\Firebase\Exception\AuthException;
+use Kreait\Firebase\Exception\FirebaseException;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
     use UserTrait;
+    protected FirebaseService $firebaseService;
+//
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
 
     public function sendAuthEmailVerificationCode(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -66,6 +76,10 @@ class AuthController extends Controller
 
     }
 
+    /**
+     * @throws FirebaseException
+     * @throws AuthException
+     */
     public function verifyAuthEmail(Request $request): \Illuminate\Http\JsonResponse
     {
 
@@ -103,17 +117,17 @@ class AuthController extends Controller
         ]);
 
         // valid code
-        $token = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
+        $tokens = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
 
 
-        return response()->json(ApiResponse::successResponseWithData($token));
+        return response()->json(ApiResponse::successResponseWithData($tokens));
 
     }
 
     public function redirectToOAuth2Provider(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $validator = Validator::make($request->all(), [
-           'provider' => 'required'
+            'provider' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -131,13 +145,17 @@ class AuthController extends Controller
 //            https://github.com/mikebronner/laravel-sign-in-with-apple for apple configuration
 //            https://socialiteproviders.com/Apple/#installation-basic-usage
 //            return Socialite::driver("apple")->redirect();
-                return Socialite::driver('apple')->redirect();
+            return Socialite::driver('apple')->redirect();
         }
 
         return response()->json(ApiResponse::failedResponse('Invalid provider'));
 
     }
 
+    /**
+     * @throws FirebaseException
+     * @throws AuthException
+     */
     public function oAuth2ProviderCallback(Request $request): \Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
 
@@ -180,9 +198,10 @@ class AuthController extends Controller
             }
 
 
-            $token = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
-
-            return redirect('/?token=' . $token);
+            $tokens = $this->generateAccessTokenFromEmail(userIp: $userIp, email: $email);
+            $accessToken = $tokens['access_token'];
+            $firebaseToken = $tokens['custom_token'];
+            return redirect('/?access_token=' . $accessToken . '&custom_token=' . $firebaseToken);
 
 
 
@@ -193,7 +212,13 @@ class AuthController extends Controller
 
     }
 
-    private function generateAccessTokenFromEmail(string $userIp, string $email) : string {
+    /**
+     * @throws AuthException
+     * @throws FirebaseException
+     */
+    #[ArrayShape(['access_token' => "mixed", 'custom_token' => "\Lcobucci\JWT\UnencryptedToken"])]
+    private function generateAccessTokenFromEmail(string $userIp, string $email): array
+    {
 
         $parts = explode('@', $email);
         $name = $parts[0];
@@ -204,14 +229,24 @@ class AuthController extends Controller
         $user = User::with([])->where('email', $email)->first();
         if(blank($user)) {
             // sign up --------
-             $user = User::with([])->create([
+            $publicKey = Str::uuid();
+            $user = User::with([])->create([
                 'email' => $email,
                 'name' => $name,
                 'last_login_at' => $now,
                 'email_verified_at' => $now,
-                'first_login_at' => $now
+                'first_login_at' => $now,
+                'public_key' => $publicKey
             ]);
+
+            $firebaseUser = $this->firebaseService->createFirebaseUser($email, $publicKey);
+            $customToken = $this->firebaseService->createCustomToken($firebaseUser->uid)->toString();
+
         }else {
+
+            $firebaseUser = $this->firebaseService->getFirebaseUser($email);
+            $customToken = $this->firebaseService->createCustomToken($firebaseUser->uid)->toString();
+
             $user->update([
                 'last_login_at' => $now,
                 'email_verified_at' => $now
@@ -221,7 +256,7 @@ class AuthController extends Controller
         $userInfo = UserInfo::with([])->firstOrCreate(
             ['user_id' => $user->{'id'}],
             [
-              'bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"
+                'bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"
             ]
         );
 
@@ -232,8 +267,13 @@ class AuthController extends Controller
 
         $token = $user->createToken($email);
         Log::info('token: ' . json_encode($token));
+        Log::info('firebase token: ' . json_encode($customToken));
 
-        return $token->plainTextToken;
+
+        return [
+            'access_token' => $token->plainTextToken,
+            'custom_token' => $customToken
+        ];
     }
 
     public function updateAuthUserProfile(Request $request): JsonResponse {

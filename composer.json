@@ -9,6 +9,7 @@
         "algolia/algoliasearch-client-php": "^3.4",
         "algolia/scout-extended": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
+        "kreait/laravel-firebase": "^5.8",
         "laravel-notification-channels/telegram": "^2.1",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
