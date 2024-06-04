@@ -70,6 +70,19 @@ trait UserTrait
 
         $user->{"introductory_post"} = $introductoryStory;
 
+        $user = $this->attachUserComputedAge($user);
+
+        // if its not from auth user
+        if(!blank($id)) {
+            // Hide fields you don't want to include in the JSON response
+            $user->makeHidden(['first_login_at', 'public_key', 'last_login_at']);
+        }
+//        return response()->json(ApiResponse::successResponseV2($user));
+        return response()->json(ApiResponse::successResponseWithData($user));
+
+    }
+
+    protected function attachUserComputedAge($user) {
         if($user->{"info"}) {
 
             //! Get user's age as at this year
@@ -82,15 +95,7 @@ trait UserTrait
                 $user->{"display_age"} = $user->{"info"}->{"age"};
             }
         }
-
-        // if its not from auth user
-        if(!blank($id)) {
-            // Hide fields you don't want to include in the JSON response
-            $user->makeHidden(['first_login_at', 'public_key', 'last_login_at']);
-        }
-//        return response()->json(ApiResponse::successResponseV2($user));
-        return response()->json(ApiResponse::successResponseWithData($user));
-
+        return $user;
     }
 
     protected function setLocationInfo($userInfo, string $userIp): void

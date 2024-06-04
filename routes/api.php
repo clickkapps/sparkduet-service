@@ -43,6 +43,17 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Users Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
+    Route::get('suggested', [\App\Http\Controllers\ChatController::class, 'fetchSuggestedChats']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
 | Stories Routes
 |--------------------------------------------------------------------------
 */
