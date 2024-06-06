@@ -29,6 +29,14 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
     Route::get('basic-info-prompted', [\App\Http\Controllers\AuthController::class, 'setPromptBasicInfoCompleted']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Push notification routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('chat')->middleware('basicAuth')->group(function () {
+    Route::post('message-created', [\App\Http\Controllers\ChatController::class, 'messageCreated']);
+});
 
 /*
 |--------------------------------------------------------------------------

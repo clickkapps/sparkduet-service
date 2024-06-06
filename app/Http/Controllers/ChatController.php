@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
 use App\Models\User;
+use App\Notifications\ChatMessageCreated;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ChatController extends Controller
 {
@@ -25,5 +27,33 @@ class ChatController extends Controller
         });
 
         return response()->json(ApiResponse::successResponseWithData($users));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function messageCreated(Request $request): \Illuminate\Http\JsonResponse
+    {
+
+        $this->validate($request, [
+           'sender_id' => 'required',
+           'recipient_id' => 'required',
+           'chat_connection_id' => 'required',
+        ]);
+        $senderId = $request->get('sender_id');
+        $recipientId = $request->get('recipient_id');
+        $chatConnectionId = $request->get('chat_connection_id');
+
+        $sender = User::with([])->find($senderId);
+        $recipient =  User::with([])->find($recipientId);
+
+        if(blank($sender) || blank($recipient)) {
+            return response()->json(ApiResponse::failedResponse("Invalid request"));
+        }
+
+        $recipient->notify(new ChatMessageCreated(sender: $sender,  chatConnectionId: $chatConnectionId));
+
+        return response()->json(ApiResponse::successResponse());
+
     }
 }

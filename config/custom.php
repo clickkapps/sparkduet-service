@@ -21,4 +21,9 @@ return [
     'mux_token_id_dev' => env('MUX_TOKEN_ID_DEV',null),
     'mux_token_secret_dev' => env('MUX_TOKEN_SECRET_DEV',null),
 
+    'one_signal_app_id' => env("ONE_SIGNAL_APP_ID", null),
+    'one_signal_api_key' => env("ONE_SIGNAL_API_KEY", null),
+    'one_signal_api_url' => env("ONE_SIGNAL_API_URL", null),
+    'one_signal_large_icon' => env("ONE_SIGNAL_LARGE_ICON", null),
+
 ];
