@@ -36,6 +36,7 @@ class ChatController extends Controller
     public function messageCreated(Request $request): \Illuminate\Http\JsonResponse
     {
 
+        Log::info("messageCreated in controller called..");
         $this->validate($request, [
            'sender_id' => 'required',
            'recipient_id' => 'required',
