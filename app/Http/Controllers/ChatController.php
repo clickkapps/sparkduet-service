@@ -8,6 +8,7 @@ use App\Notifications\ChatMessageCreated;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ChatController extends Controller
@@ -48,6 +49,7 @@ class ChatController extends Controller
         $recipient =  User::with([])->find($recipientId);
 
         if(blank($sender) || blank($recipient)) {
+            Log::info("invalid sender or recipient");
             return response()->json(ApiResponse::failedResponse("Invalid request"));
         }
 
