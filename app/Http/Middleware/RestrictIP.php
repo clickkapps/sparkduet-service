@@ -24,7 +24,7 @@ class RestrictIP
         Log::info('incoming request IP: ' . json_encode($request->ip()));
 
         $countryCode = ip_info("Visitor", "Country Code"); // IN
-        if ( $countryCode != null && $countryCode != 'NL' && $countryCode != 'GH' && $countryCode != 'CA') {
+        if ( $countryCode == 'IND') {
             // allow only request from the countries in the condition above
             Log::info('IP rejected: :' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
             exit;
