@@ -31,7 +31,7 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      */
     public function broadcastOn(): Channel|PrivateChannel|array
     {
-        return new PrivateChannel('spark-socket');
+        return new Channel('spark-socket');
     }
 
     /**
