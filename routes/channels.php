@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Broadcast;
 //});
 
 
-Broadcast::channel('spark-socket', function ($user) {
-    \Illuminate\Support\Facades\Log::info("user received: " . json_encode($user));
-    return true;
-});
+//Broadcast::channel('users.{id}', function ($user) {
+//    \Illuminate\Support\Facades\Log::info("user received: " . json_encode($user));
+//    return true;
+//});

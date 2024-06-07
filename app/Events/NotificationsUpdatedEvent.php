@@ -20,7 +20,7 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public int $count)
+    public function __construct(public int $userId,public int $count)
     {
     }
 
@@ -31,7 +31,7 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      */
     public function broadcastOn(): Channel|PrivateChannel|array
     {
-        return new Channel('spark-socket');
+        return new Channel('users.'.$this->userId);
     }
 
     /**
