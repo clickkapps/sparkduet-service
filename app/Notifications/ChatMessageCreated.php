@@ -44,7 +44,7 @@ class ChatMessageCreated extends Notification
         return [
             "userId" => $notifiable->{'username'},
             'title' =>  $this->sender->{'name'} ?: $this->sender->{'username'},
-            'message' => "New message", // we do this to hide the message.
+            'message' => "Sent you a message", // we do this to hide the message.
             'data' => [
                 'pushType' => 'chat',
                 'chatConnectionId' => $this->chatConnectionId
