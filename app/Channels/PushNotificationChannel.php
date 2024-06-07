@@ -53,7 +53,7 @@ class PushNotificationChannel
         try{
 
             $response = Http::withToken($apiKey)->post($url, $postData);
-            Log::info("push response: " . json_encode($response));
+            Log::info("push response: " . json_encode($response->json()));
 
 
         }catch (\Exception $e){
