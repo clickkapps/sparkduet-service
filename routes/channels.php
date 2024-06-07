@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+//Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+//    return (int) $user->id === (int) $id;
+//});
+
+
+Broadcast::channel('spark-socket', function ($user) {
+    \Illuminate\Support\Facades\Log::info("user received: " . json_encode($user));
+    return true;
 });

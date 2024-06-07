@@ -134,3 +134,13 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
     Route::get('user-search-terms', [\App\Http\Controllers\SearchController::class, 'getUserSearchTerms']);
     Route::get('popular-search-terms', [\App\Http\Controllers\SearchController::class, 'popularSearches']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Notifications routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('notification')->middleware('basicAuth')->group(function () {
+    Route::post('/', [\App\Http\Controllers\NotificationsController::class, 'fetchNotifications']);
+});
+
