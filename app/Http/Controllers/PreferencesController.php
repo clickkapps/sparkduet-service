@@ -52,6 +52,10 @@ class PreferencesController extends Controller
             $settingsPayload["font_family"] = $request->get("font_family");
         }
 
+        if($request->has("show_swipe_up_stories_hint")) {
+            $settingsPayload["show_swipe_up_stories_hint"] = $request->get("show_swipe_up_stories_hint");
+        }
+
         if(!empty($settingsPayload)) {
             DB::table('user_settings')->where('user_id', $authUser->{'id'})->update($settingsPayload);
         }
