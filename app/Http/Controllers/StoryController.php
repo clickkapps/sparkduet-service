@@ -14,6 +14,7 @@ use App\Traits\UserTrait;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class StoryController extends Controller
@@ -69,9 +70,7 @@ class StoryController extends Controller
         $merged = $updatedItems->getCollection();
 
         $pageKey = $request->get('page');
-        if($pageKey == 1) {
-
-        }
+        Log::info("page=".$pageKey);
 
         $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
         if(blank($introductoryPost)) {
