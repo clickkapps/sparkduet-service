@@ -60,7 +60,7 @@ class StoryController extends Controller
             ->where('media_path', '!=', "")
             ->where('blocked_by_admin_at', '=', null);
 
-        $stories = $query->simplePaginate(3)->through(function ($story, $key) use ($user){
+        $stories = $query->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
             return $story;
         });
 
@@ -68,35 +68,46 @@ class StoryController extends Controller
 
         $merged = $updatedItems->getCollection();
 
+        $pageKey = $request->get('page');
+        if($pageKey == 1) {
+
+        }
+
         $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
         if(blank($introductoryPost)) {
-            $merged = $updatedItems->concat([
-                [ 'id' => -1 ], /// Introductory video
-            ]);
+            if($pageKey == 1) {
+                $merged = $updatedItems->concat([
+                    [ 'id' => -1 ], /// Introductory video
+                ]);
+            }
         }else {
             $expectationPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "expectations"])->first();
             if(blank($expectationPost)) {
-                $merged = $updatedItems->concat([
-                    [ 'id' => -2 ], /// Introductory video
-                ]);
-            }else {
-                $previousRelationshipPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "previousRelationship"])->first();
-                if(blank($previousRelationshipPost)) {
+                if($pageKey == 2) {
                     $merged = $updatedItems->concat([
-                        [ 'id' => -3 ], /// Introductory video
+                        [ 'id' => -2 ], /// Introductory video
                     ]);
-                }else {
-                    $careerPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
-                    if(blank($careerPost)) {
+                }
+            }else {
+                if($pageKey == 3) {
+                    $previousRelationshipPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "previousRelationship"])->first();
+                    if(blank($previousRelationshipPost)) {
                         $merged = $updatedItems->concat([
-                            ['id' => -4], /// Introductory video
+                            [ 'id' => -3 ], /// Introductory video
                         ]);
                     }else {
-                        $otherPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
-                        if(blank($otherPost)) {
+                        $careerPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
+                        if(blank($careerPost)) {
                             $merged = $updatedItems->concat([
-                                ['id' => -5], /// Introductory video
+                                ['id' => -4], /// Introductory video
                             ]);
+                        }else {
+                            $otherPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
+                            if(blank($otherPost)) {
+                                $merged = $updatedItems->concat([
+                                    ['id' => -5], /// Introductory video
+                                ]);
+                            }
                         }
                     }
                 }
