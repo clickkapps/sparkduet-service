@@ -111,7 +111,9 @@ class StoryController extends Controller
 
             if(blank($introductoryPost)) {
                 // insert introductory post at position 2 (index 1)
-                $merged = $updatedItems->splice(1, 0, [ 'id' => -1 ]);
+                $merged = $updatedItems->concat([
+                    [ 'id' => -1 ], /// Introductory video
+                ]);
             }
 
         }
