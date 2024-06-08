@@ -64,23 +64,14 @@ class StoryController extends Controller
             return $story;
         });
 
-//        $updatedItems = $stories->getCollection();
-//        // Add bookmark status to each story
-//        $updatedItems->each(function ($story) use ($user) {
-//            $story->user_has_bookmarked = $story->isBookmarkedByUser($user->{'id'});
-//            $story->story_likes_by_user = $story->getStoryLikesByUser($user->{'id'});
-//            $story->user_view_info = $story->viewInfo($user->{'id'});
-//        });
-
-
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
         $merged = $updatedItems->getCollection();
+        $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
 
         if($updatedItems->isEmpty()) {
 
             /// This prompts the user to create post
-            $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
 
             if(blank($introductoryPost)) {
                 $merged = $updatedItems->concat([
@@ -118,7 +109,12 @@ class StoryController extends Controller
 
         }else {
 
-
+            if(blank($introductoryPost)) {
+                // insert introductory post at position 2 (index 1)
+                $merged = $updatedItems->splice(1, 0, [
+                    [ 'id' => -1 ]
+                ]);
+            }
 
         }
 
