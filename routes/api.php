@@ -46,6 +46,10 @@ Route::prefix('chat')->middleware('basicAuth')->group(function () {
 
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('profile/{id?}', [\App\Http\Controllers\UserController::class, 'getUserProfile']);
+    Route::post('record-profile-view', [\App\Http\Controllers\UserController::class, 'recordProfileView']);
+    Route::post('mark-profile-view-as-read', [\App\Http\Controllers\UserController::class, 'markProfileViewsAsRead']);
+    Route::get('fetch-unread-profile-viewers', [\App\Http\Controllers\UserController::class, 'fetchUnreadProfileViewers']);
+    Route::get('count-unread-profile-views', [\App\Http\Controllers\UserController::class, 'countUnreadProfileViews']);
 });
 
 
