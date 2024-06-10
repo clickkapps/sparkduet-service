@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Models\ProfileView;
 use App\Models\User;
 use App\Traits\UserTrait;
 use Illuminate\Http\JsonResponse;
@@ -62,7 +63,7 @@ class UserController extends Controller
     {
         $profileOwner = $request->user();
 
-        $paginated = DB::table('profile_views')->where([
+        $paginated = ProfileView::with(['viewer', 'profile'])->where([
             'profile_id' => $profileOwner->{'id'},
             'profile_owner_read_at' => null
         ])->simplePaginate($request->get('limit') ?: 10 );
