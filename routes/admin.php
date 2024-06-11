@@ -18,6 +18,7 @@ Route::prefix('auth')->middleware('basicAuth')->group(function () {
 */
 Route::prefix('user')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('create-notice', [\App\Http\Controllers\UserController::class, 'createUserNotice']);
+    Route::post('delete-notice', [\App\Http\Controllers\UserController::class, 'deleteUserNotice']);
     Route::post('take-disciplinary-action', [\App\Http\Controllers\UserController::class, 'takeDisciplinaryActionOnUser']);
 });
 

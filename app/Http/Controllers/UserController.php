@@ -133,9 +133,26 @@ class UserController extends Controller
         DB::table('user_notices')->insert([
             'user_id' => $userId,
             'notice' => $notice,
-            'create_at' => now(),
+            'created_at' => now(),
             'updated_at' => now()
         ]);
+
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function deleteUserNotice(Request $request): JsonResponse
+    {
+
+        $this->validate($request, [
+            'notice_id' => 'required',
+        ]);
+
+        $noticeId = $request->get('notice_id');
+
+        DB::table('user_notices')->where('id' , $noticeId)->delete();
 
         return response()->json(ApiResponse::successResponse());
     }
