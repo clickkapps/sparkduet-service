@@ -16,14 +16,14 @@ Route::prefix('auth')->middleware('basicAuth')->group(function () {
 | Users Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('user')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::prefix('user')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
     Route::post('create-notice', [\App\Http\Controllers\UserController::class, 'createUserNotice']);
     Route::post('delete-notice', [\App\Http\Controllers\UserController::class, 'deleteUserNotice']);
     Route::post('take-disciplinary-action', [\App\Http\Controllers\UserController::class, 'takeDisciplinaryActionOnUser']);
 });
 
 
-Route::prefix('stories')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::prefix('stories')->middleware(['auth:sanctum', 'role:Admin'])->group(function () {
     Route::post('take-disciplinary-action', [\App\Http\Controllers\StoryController::class, 'takeDisciplinaryActionOnStory']);
 });
 
