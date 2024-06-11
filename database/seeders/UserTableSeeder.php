@@ -32,8 +32,8 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $email = 'clickkapps@gmail.com';
-        $password = Hash::make('0541243508');
+        $email = config('custom.super_admin_email');
+        $password = Hash::make(config('custom.super_admin_password'));
         $admin = User::with([])->create([
             'name' => 'Admin',
             'email' => $email,
