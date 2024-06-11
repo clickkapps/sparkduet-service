@@ -7,6 +7,10 @@ Route::get('/', function () {
     return response()->json(ApiResponse::successResponse('Admin api route is running'));
 });
 
+Route::prefix('auth')->middleware('basicAuth')->group(function () {
+    Route::post('login', [\App\Http\Controllers\AuthController::class, 'sendAuthEmailVerificationCode']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Users Routes

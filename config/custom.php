@@ -10,6 +10,7 @@ return [
     'currency' => env('CURRENCY', 'USD'),
     'basic_auth_username' => env('BASIC_AUTH_USERNAME', null),
     'basic_auth_password' => env('BASIC_AUTH_PASSWORD', null),
+    'admin_security_code' => env('ADMIN_SECURITY_CODE', null),
 
 //    'sms_client_id' => env('SMS_CLIENT_ID', null),
 //    'sms_api_key' => env('SMS_API_KEY', null),

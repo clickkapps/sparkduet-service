@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use JetBrains\PhpStorm\ArrayShape;
 use Kreait\Firebase\Exception\AuthException;
 use Kreait\Firebase\Exception\FirebaseException;
@@ -30,6 +31,56 @@ class AuthController extends Controller
     public function __construct(FirebaseService $firebaseService)
     {
         $this->firebaseService = $firebaseService;
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws \Exception
+     */
+    /**
+     * @throws AuthException
+     * @throws FirebaseException
+     * @throws \Exception
+     */
+    public function adminLogin(Request $request): JsonResponse
+    {
+
+        $this->validate($request, [
+           'email' => 'required',
+           'password' => 'required',
+           'security_code' => 'required'
+        ]);
+
+        $securityCode = ''; // This has to be changed frequently (or when foul play is detected)
+        $adminSecurityCode = config('custom.admin_security_code');
+        if($securityCode  != $adminSecurityCode) {
+            throw  new \Exception("Invalid request");
+        }
+
+        $email = $request->get('email');
+        $password = $request->get('password');
+
+        $user = User::with([])->where('email', $email)->first();
+        if(blank($user)) {
+            throw new \Exception("Invalid request");
+        }
+
+        if(!Hash::check($password, $user->{"password"})) {
+            throw new \Exception('Invalid credentials');
+        }
+
+        $token = $user->createToken($email);
+
+        $firebaseUser = $this->firebaseService->getFirebaseUser($email);
+        $customToken = $this->firebaseService->createCustomToken($firebaseUser->uid)->toString();
+
+        $user->update(['last_login_at' => now(),]);
+
+        return response()->json(ApiResponse::successResponseWithData([
+            'access_token' => $token->plainTextToken,
+            'custom_token' => $customToken
+        ]));
+
     }
 
     public function sendAuthEmailVerificationCode(Request $request): \Illuminate\Http\JsonResponse
@@ -249,7 +300,7 @@ class AuthController extends Controller
 
             $user->update([
                 'last_login_at' => $now,
-                'email_verified_at' => $now
+//                'email_verified_at' => $now
             ]);
         }
 
