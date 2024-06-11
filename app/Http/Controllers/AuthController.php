@@ -51,7 +51,7 @@ class AuthController extends Controller
            'security_code' => 'required'
         ]);
 
-        $securityCode = ''; // This has to be changed frequently (or when foul play is detected)
+        $securityCode = $request->get('security_code'); // This has to be changed frequently (or when foul play is detected)
         $adminSecurityCode = config('custom.admin_security_code');
         if($securityCode  != $adminSecurityCode) {
             throw  new \Exception("Invalid request");
