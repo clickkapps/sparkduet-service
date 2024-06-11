@@ -8,7 +8,7 @@ Route::get('/', function () {
 });
 
 Route::prefix('auth')->middleware('basicAuth')->group(function () {
-    Route::post('login', [\App\Http\Controllers\AuthController::class, 'sendAuthEmailVerificationCode']);
+    Route::post('login', [\App\Http\Controllers\AuthController::class, 'adminLogin']);
 });
 
 /*
