@@ -15,12 +15,14 @@ class Story extends Model
         'user_id',
         'description',
         'comments_disabled_at',
-        'blocked_by_admin_at',
         'media_path',
         'media_type',
         'asset_id',
         'purpose',
-        'aspect_ratio'
+        'aspect_ratio',
+        'disciplinary_action',
+        'disciplinary_action_taken_at',
+        'disciplinary_action_taken_by'
     ];
 
     // Ensure full_name is included in array and JSON representations

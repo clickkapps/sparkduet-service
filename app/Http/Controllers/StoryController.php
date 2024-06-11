@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class StoryController extends Controller
 {
@@ -58,8 +59,7 @@ class StoryController extends Controller
         $user = $request->user();
         $query = Story::with(['user.info'])
             ->where("user_id", "!=", $user->id)
-            ->where('media_path', '!=', "")
-            ->where('blocked_by_admin_at', '=', null);
+            ->where('media_path', '!=', "");
 
         $stories = $query->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
             return $story;
@@ -141,8 +141,7 @@ class StoryController extends Controller
         $query = Story::with(['user'])
             ->where(["user_id" => $userId])
             ->withCount(['likes', 'views'])
-            ->orderByDesc("created_at")
-            ->where('blocked_by_admin_at', '=', null);
+            ->orderByDesc("created_at");
 
         $posts = $query->simplePaginate($request->get("limit") ?: 9);
 
@@ -184,7 +183,6 @@ class StoryController extends Controller
             'user_id' => $user->id,
             'description' => $description,
             'comments_disabled_at' => $commentsDisabled ? now() : null,
-            'blocked_by_admin_at' => null,
             'media_path' => $mediaPath,
             'media_type' => $mediaType,
             'asset_id' => $assetId,
@@ -369,6 +367,37 @@ class StoryController extends Controller
 
         return response()->json(ApiResponse::successResponse());
 
+    }
+
+    // For admins
+    // Change user status -> ["banned", "warned"]
+    /**
+     * @throws ValidationException
+     * @throws \Exception
+     */
+    public function takeDisciplinaryActionOnStory(Request $request) {
+
+        $this->validate($request, [
+            'story_id' => 'required',
+            'disciplinary_action' => 'required'
+        ]);
+
+        $admin = $request->user();
+        $storyId = $request->get('story_id');
+        $disciplinaryAction = $request->get('disciplinary_action');
+
+        $story = Story::with([])->where(['id' => $storyId])
+            ->first();
+
+        if(blank($story)) {
+            throw new \Exception("Invalid story id");
+        }
+
+        $story->update([
+            'disciplinary_action' => $disciplinaryAction,
+            'disciplinary_action_taken_at' => now(),
+            'disciplinary_action_taken_by' => $admin->{'id'}
+        ]);
     }
 
 

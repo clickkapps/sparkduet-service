@@ -50,6 +50,10 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::post('mark-profile-view-as-read', [\App\Http\Controllers\UserController::class, 'markProfileViewsAsRead']);
     Route::get('fetch-unread-profile-viewers', [\App\Http\Controllers\UserController::class, 'fetchUnreadProfileViewers']);
     Route::get('count-unread-profile-views', [\App\Http\Controllers\UserController::class, 'countUnreadProfileViews']);
+    Route::get('get-notice', [\App\Http\Controllers\UserController::class, 'getUserNotice']);
+    Route::post('report-user', [\App\Http\Controllers\UserController::class, 'reportUser']);
+    Route::post('block-user', [\App\Http\Controllers\UserController::class, 'userBlocksOffender']);
+    Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
 });
 
 

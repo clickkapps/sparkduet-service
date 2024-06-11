@@ -27,9 +27,11 @@ class User extends Authenticatable
         'last_login_at',
         'first_login_at',
         'email_verified_at',
-        'blocked',
         'public_key',
-        'chat_id'
+        'chat_id',
+        'disciplinary_action',
+        'disciplinary_action_taken_at',
+        'disciplinary_action_taken_by'
     ];
 
     /**
