@@ -10,7 +10,7 @@ use NotificationChannels\Telegram\Telegram;
 use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
-class StoryReportCreated extends Notification
+class StoryReportCreated extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,9 +40,10 @@ class StoryReportCreated extends Notification
         $storyId = $this->storyId;
         $reporterId = $notifiable->{'id'};
 
-        $message = "Reported: Story ID - $storyId\n";
-        $message .= $reason . "\n";
-        $message .= "--Reporter ID: $reporterId -- \n";
+        $message = "Story Reported: Story ID - $storyId\n";
+        $message .= "Reason: ". $reason . "\n";
+        $message .= "Reporter ID: $reporterId -- \n";
+        $message .= "------------------------------- \n";
 
         return TelegramMessage::create()
             // Optional recipient user id.
