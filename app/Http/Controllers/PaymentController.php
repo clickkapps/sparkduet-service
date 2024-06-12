@@ -16,10 +16,17 @@ class PaymentController extends Controller
         $appUserId = $event['app_user_id'] ?? "";
         $type = $event['type'] ?? "";
         $environment = $event['environment'] ?? "";
-        $admin = getAdmin();
-        if(!blank($admin)) {
-            $admin->notify(new SubscriptionUpdated(appUserId: $appUserId, type: $type, productId: $productId, environment: $environment));
+
+        // notify us for only live purchases
+        if($environment != "SANDBOX") {
+            $admin = getAdmin();
+            if(!blank($admin)) {
+                $admin->notify(new SubscriptionUpdated(appUserId: $appUserId, type: $type, productId: $productId, environment: $environment));
+            }
+        }else {
+            json_encode("Revcat: " . json_encode($event));
         }
+
         return response()->json();
     }
 }
