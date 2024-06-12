@@ -6,11 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Telegram\Telegram;
 use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
-class StoryReportCreated extends Notification implements ShouldQueue
+class SubscriptionUpdated extends Notification
 {
     use Queueable;
 
@@ -19,7 +18,7 @@ class StoryReportCreated extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public $storyId, public  $reason)
+    public function __construct(public $appUserId, public $type, public $productId)
     {}
 
     /**
@@ -36,13 +35,11 @@ class StoryReportCreated extends Notification implements ShouldQueue
     public function toTelegram($notifiable)
     {
 
-        $reason = $this->reason;
-        $storyId = $this->storyId;
-        $reporterId = $notifiable->{'id'};
-
-        $message = "Story Reported: Story ID - $storyId\n";
-        $message .= "Reason: ". $reason . "\n";
-        $message .= "Reporter ID: $reporterId \n";
+        $message = "Subscription Update:\n";
+        $message .= "------------------------------- \n";
+        $message .= "User ID: ". $this->appUserId . "\n";
+        $message .= "type: " .$this->type . " \n";
+        $message .= "product: " .$this->productId . " \n";
         $message .= "------------------------------- \n";
 
         return TelegramMessage::create()

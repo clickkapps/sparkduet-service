@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 function generateRandomNumber($digits = 6): string
 {
     return str_pad(rand(0, pow(10, $digits)-1), $digits, '0', STR_PAD_LEFT);
@@ -18,6 +20,12 @@ function isDevelopment(): bool
 function isLocal(): bool
 {
     return config('app.env') == 'local';
+}
+
+function getAdmin()
+{
+    $email = config('custom.super_admin_email');
+    return User::with([])->where(['email' => $email])->first();
 }
 
 /// ref -> https://stackoverflow.com/questions/12553160/getting-visitors-country-from-their-ip
