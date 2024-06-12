@@ -13,4 +13,9 @@ class StoryReport extends Model
       'story_id',
       'reason'
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

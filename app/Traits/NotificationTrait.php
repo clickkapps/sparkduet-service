@@ -9,4 +9,5 @@ trait NotificationTrait
     public function countNotifications(): void {
         event(new NotificationsUpdatedEvent(1,24));
     }
+
 }

@@ -10,7 +10,7 @@
         "algolia/scout-extended": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "kreait/laravel-firebase": "^5.8",
-        "laravel-notification-channels/telegram": "^2.1",
+        "laravel-notification-channels/telegram": "^3.0",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/scout": "^9.8",

@@ -9,6 +9,7 @@ use App\Models\StoryLike;
 use App\Models\StoryReport;
 use App\Models\StoryView;
 use App\Models\User;
+use App\Notifications\StoryReportCreated;
 use App\Traits\StoryTrait;
 use App\Traits\UserTrait;
 use Illuminate\Database\Query\Builder;
@@ -359,11 +360,13 @@ class StoryController extends Controller
         $user = $request->user();
         $reason = $request->get('reason');
 
-        StoryReport::with([])->create([
+        $reported = StoryReport::with([])->create([
             'user_id' => $user->id,
             'story_id' => $postId,
             'reason' => $reason,
         ]);
+
+        $reported->{'user'}->notify(new StoryReportCreated(storyId: $reported->{'id'}, reason: $reason));
 
         return response()->json(ApiResponse::successResponse());
 
