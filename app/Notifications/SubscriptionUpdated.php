@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
-class SubscriptionUpdated extends Notification
+class SubscriptionUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -18,7 +18,7 @@ class SubscriptionUpdated extends Notification
      *
      * @return void
      */
-    public function __construct(public $appUserId, public $type, public $productId)
+    public function __construct(public $appUserId, public $type, public $productId, public $environment)
     {}
 
     /**
@@ -40,6 +40,7 @@ class SubscriptionUpdated extends Notification
         $message .= "User ID: ". $this->appUserId . "\n";
         $message .= "type: " .$this->type . " \n";
         $message .= "product: " .$this->productId . " \n";
+        $message .= "environment: " .$this->environment . " \n";
         $message .= "------------------------------- \n";
 
         return TelegramMessage::create()
