@@ -129,10 +129,12 @@ class UserController extends Controller
 
         $userId = $request->get('user_id');
         $notice = $request->get('notice');
+        $link = $request->get('link') ?: null;
 
         DB::table('user_notices')->insert([
             'user_id' => $userId,
             'notice' => $notice,
+            'link' => $link,
             'created_at' => now(),
             'updated_at' => now()
         ]);
@@ -166,6 +168,23 @@ class UserController extends Controller
         ])->orderByDesc('created_at')->first();
 
         return response()->json(ApiResponse::successResponseWithData($notice));
+    }
+
+    // Any notice served to the user by the admin
+    /**
+     * @throws ValidationException
+     */
+    public function markNoticeAsRead(Request $request): JsonResponse {
+
+        $this->validate($request, [
+            'notice_id' => 'required',
+        ]);
+        $noticeId = $request->get('notice_id');
+        UserNotice::with([])->where([
+            'id' => $noticeId,
+        ])->update(['notice_read_at' => now()]);
+
+        return response()->json(ApiResponse::successResponse());
     }
 
 

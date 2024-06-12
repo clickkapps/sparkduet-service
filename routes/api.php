@@ -51,6 +51,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('fetch-unread-profile-viewers', [\App\Http\Controllers\UserController::class, 'fetchUnreadProfileViewers']);
     Route::get('count-unread-profile-views', [\App\Http\Controllers\UserController::class, 'countUnreadProfileViews']);
     Route::get('get-notice', [\App\Http\Controllers\UserController::class, 'getUserNotice']);
+    Route::post('get-notice', [\App\Http\Controllers\UserController::class, 'markNoticeAsRead']);
     Route::post('report-user', [\App\Http\Controllers\UserController::class, 'reportUser']);
     Route::post('block-user', [\App\Http\Controllers\UserController::class, 'userBlocksOffender']);
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
@@ -152,3 +153,9 @@ Route::prefix('notification')->middleware('basicAuth')->group(function () {
     Route::post('/', [\App\Http\Controllers\NotificationsController::class, 'fetchNotifications']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Payment routes
+|--------------------------------------------------------------------------
+*/
+Route::post('revenue-cat-callback', [\App\Http\Controllers\PaymentController::class, 'revenueCatWebhookCallback']);
