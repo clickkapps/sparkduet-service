@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Telegram\Telegram;
+use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
 class StoryReportCreated extends Notification
@@ -29,7 +30,7 @@ class StoryReportCreated extends Notification
      */
     public function via(mixed $notifiable)
     {
-        return [Telegram::class];
+        return [TelegramChannel::class];
     }
 
     public function toTelegram($notifiable)
