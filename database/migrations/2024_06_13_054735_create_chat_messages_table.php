@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('chat_connection_id')->constrained('chat_connections');
             $table->string('client_id')->nullable()->nullable();
             $table->foreignId('parent_id')->nullable()->default(null);
-            $table->dateTime('deleted_at')->nullable()->default(false);
-            $table->dateTime('delivered_at')->nullable()->default(false);
-            $table->dateTime('seen_at')->nullable()->default(false);
+            $table->dateTime('deleted_at')->nullable()->default(null);
+            $table->dateTime('delivered_at')->nullable()->default(null);
+            $table->dateTime('seen_at')->nullable()->default(null);
             $table->string('attachment_path')->nullable()->default(null);
             $table->string('attachment_type')->nullable()->default(null)->comment('image/video');
             $table->text('text')->nullable()->default(null);
