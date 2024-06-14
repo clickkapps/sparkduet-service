@@ -66,6 +66,9 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::get('suggested', [\App\Http\Controllers\ChatController::class, 'fetchSuggestedChats']);
+    Route::post('create-chat-connection', [\App\Http\Controllers\ChatController::class, 'createChatConnection']);
+    Route::get('fetch-chat-connections', [\App\Http\Controllers\ChatController::class, 'fetchChatConnections']);
+    Route::get('get-chat-connection/{id}', [\App\Http\Controllers\ChatController::class, 'getChatConnection']);
 });
 
 /*

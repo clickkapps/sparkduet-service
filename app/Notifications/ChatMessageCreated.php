@@ -17,7 +17,7 @@ class ChatMessageCreated extends Notification
      *
      * @return void
      */
-    public function __construct(private $sender, public readonly string $chatConnectionId)
+    public function __construct(private $sender, private readonly string $chatConnectionId, private readonly int $unreadMessagesCount = 0)
     { }
 
     /**
@@ -38,13 +38,14 @@ class ChatMessageCreated extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    #[ArrayShape(["userId" => "", 'title' => "mixed", 'message' => "string", 'data' => "array"])]
+    #[ArrayShape(["userId" => "", 'title' => "mixed", 'message' => "string", 'unread' => "int", 'data' => "array"])]
     public function toPush(mixed $notifiable): array
     {
         return [
             "userId" => $notifiable->{'username'},
             'title' =>  $this->sender->{'name'} ?: $this->sender->{'username'},
             'message' => "Sent you a message", // we do this to hide the message.
+            'unread' => $this->unreadMessagesCount,
             'data' => [
                 'pushType' => 'chat',
                 'chatConnectionId' => $this->chatConnectionId

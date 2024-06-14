@@ -24,6 +24,7 @@ class PushNotificationChannel
         $userId = $requestArray['userId'];
         $message = $requestArray['message'];
         $title = $requestArray['title'];
+        $unread = $requestArray['unread'] ?? 0; // counts the number of unread messages
 
         $appId = config('custom.one_signal_app_id');
         $url = config('custom.one_signal_api_url');
@@ -39,11 +40,16 @@ class PushNotificationChannel
             "target_channel" => "push",
             'contents' => ["en" => $message],
             'headings' => ["en" => $title],
-            'large_icon' => $largeIcon
+            'large_icon' => $largeIcon,
         );
 
         if (array_key_exists('data', $requestArray)) {
            $postData['data'] = $requestArray['data'];
+        }
+
+        if($unread > 0) {
+            $postData["ios_badgeType"] = "Increase";
+            $postData["ios_badgeCount"] = $unread;
         }
 
         Log::info('apiKey => ' . $apiKey);

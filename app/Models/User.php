@@ -75,5 +75,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Story::class, 'story_bookmarks', 'user_id', 'story_id');
     }
 
+    public function chatConnections(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(ChatConnection::class, 'chat_participants','user_id', 'chat_connection_id');
+    }
+
 
 }
