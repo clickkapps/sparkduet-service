@@ -29,14 +29,9 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
     Route::get('basic-info-prompted', [\App\Http\Controllers\AuthController::class, 'setPromptBasicInfoCompleted']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Push notification routes
-|--------------------------------------------------------------------------
-*/
-Route::prefix('chat')->middleware('basicAuth')->group(function () {
-    Route::post('message-created', [\App\Http\Controllers\ChatController::class, 'messageCreated']);
-});
+//Route::prefix('chat')->middleware('basicAuth')->group(function () {
+//    Route::post('message-created', [\App\Http\Controllers\ChatController::class, 'messageCreated']);
+//});
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +64,7 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::post('create-chat-connection', [\App\Http\Controllers\ChatController::class, 'createChatConnection']);
     Route::get('fetch-chat-connections', [\App\Http\Controllers\ChatController::class, 'fetchChatConnections']);
     Route::get('get-chat-connection/{id}', [\App\Http\Controllers\ChatController::class, 'getChatConnection']);
+    Route::post('send-message', [\App\Http\Controllers\ChatController::class, 'sendMessage']);
 });
 
 /*
