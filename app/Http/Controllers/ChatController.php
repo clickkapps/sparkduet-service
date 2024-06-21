@@ -136,7 +136,7 @@ class ChatController extends Controller
         $chatConnections = $user->chatConnections()
             ->whereNull('deleted_at')
             ->with('participants')
-            ->get();
+            ->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
 
         return response()->json(ApiResponse::successResponseWithData($chatConnections));
     }
