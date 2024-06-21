@@ -135,7 +135,7 @@ class ChatController extends Controller
         // Get chat connections along with participants
         $chatConnections = $user->chatConnections()
             ->whereNull('deleted_at')
-            ->with('participants')
+            ->with(['participants', 'lastMessage'])
             ->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
 
         return response()->json(ApiResponse::successResponseWithData($chatConnections));
