@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\ChatMessageCreatedEvent;
+use App\Listeners\UpdateChatConnectionLastMessageListener;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -25,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
             // ... other providers
             \SocialiteProviders\Apple\AppleExtendSocialite::class.'@handle',
         ],
+        ChatMessageCreatedEvent::class => [
+            UpdateChatConnectionLastMessageListener::class,
+        ]
     ];
 
     /**
