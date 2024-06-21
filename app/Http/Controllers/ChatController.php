@@ -194,6 +194,13 @@ class ChatController extends Controller
             $unreadMessagesCount
         ]);
 
+        $connection = ChatConnection::with(['participants'])->find($chatConnectionId);
+        if(blank($connection->{'read_first_impression_note_at'})) {
+            $connection->update([
+                'read_first_impression_note_at' => now()
+            ]);
+        }
+
         event(new ChatMessageCreatedEvent(message: $message));
 
         return response()->json(ApiResponse::successResponseWithData($message));
