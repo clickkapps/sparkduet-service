@@ -207,9 +207,13 @@ class ChatController extends Controller
         $this->validate($request, [
             'chat_connection_id' => 'required',
         ]);
+
+        $chatConnectionId = $request->get('chat_connection_id');
+
         $messages = ChatMessage::with([])->where([
-            'deleted_at' => null
-        ])->get();
+            'deleted_at' => null,
+            'chat_connection_id' => $chatConnectionId
+        ])->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
         return response()->json(ApiResponse::successResponseWithData($messages));
     }
 
