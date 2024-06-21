@@ -148,7 +148,6 @@ class ChatController extends Controller
 
     }
 
-
     /**
      * @throws ValidationException
      */
@@ -204,6 +203,19 @@ class ChatController extends Controller
     /**
      * @throws ValidationException
      */
+    public function fetchMessages(Request $request): \Illuminate\Http\JsonResponse {
+        $this->validate($request, [
+            'chat_connection_id' => 'required',
+        ]);
+        $messages = ChatMessage::with([])->where([
+            'deleted_at' => null
+        ])->get();
+        return response()->json(ApiResponse::successResponseWithData($messages));
+    }
+
+    /**
+     * @throws ValidationException
+     */
     public function markMessagesRead(Request $request) {
 
         $this->validate($request, [
@@ -225,7 +237,8 @@ class ChatController extends Controller
     /**
      * @throws ValidationException
      */
-    public function deleteMessage(Request $request) {
+    public function deleteMessage(Request $request): \Illuminate\Http\JsonResponse
+    {
 
         $this->validate($request, [
             'opponent_id' => 'required',
@@ -238,6 +251,7 @@ class ChatController extends Controller
         $message = ChatMessage::with([])->find($messageId);
         $message->update(['deleted_at' => now()]);
         event(new ChatMessageDeletedEvent(message: $message, opponentId: $opponentId));
+        return response()->json(ApiResponse::successResponse());
     }
 
     /**
