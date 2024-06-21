@@ -30,10 +30,7 @@ class UpdateChatConnectionLastMessageListener
      */
     public function handle(ChatMessageCreatedEvent $event)
     {
-        Log::info("UpdateChatConnectionLastMessageListener called....");
-        Log::info("event chatConnectionId: " . $event->message->{'chat_connection_id'});
-        Log::info("event messageId: " . $event->message->{'id'});
-
+        Log::info('UpdateChatConnectionLastMessageListener called...');
         $chatConnectionId =  $event->message->{'chat_connection_id'};
         $chatConnection = ChatConnection::with(['participants'])->find($chatConnectionId);
         $chatConnection->update([

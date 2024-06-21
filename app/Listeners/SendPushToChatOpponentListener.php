@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\ChatMessageCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class SendPushToChatOpponentListener
 {
@@ -29,6 +30,7 @@ class SendPushToChatOpponentListener
      */
     public function handle(ChatMessageCreatedEvent $event)
     {
+        Log::info('SendPushToChatOpponentListener called...');
         $opponentId = $event->message->{'sent_to_id'};
         $senderId = $event->message->{'sent_by_id'};
         $chatConnectionId = $event->message->{'chat_connection_id'};

@@ -8,6 +8,7 @@ use App\Models\ChatParticipant;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class CountUnreadChatMessagesForOpponentListener
 {
@@ -29,6 +30,7 @@ class CountUnreadChatMessagesForOpponentListener
      */
     public function handle(ChatMessageCreatedEvent $event)
     {
+        Log::info('CountUnreadChatMessagesForOpponentListener called...');
         $opponentId = $event->message->{'sent_to_id'};
         $chatConnectionId = $event->message->{'chat_connection_id'};
 
