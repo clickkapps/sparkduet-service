@@ -169,7 +169,7 @@ class ChatController extends Controller
         $attachmentType = $request->get('attachment_type');
         $text = $request->get('text');
 
-        $message = ChatMessage::with([])->create([
+        $message = ChatMessage::with(['parent'])->create([
             'chat_connection_id' => $chatConnectionId,
             'client_id' => $clientId,
             'parent_id' => $parentId,
@@ -210,7 +210,7 @@ class ChatController extends Controller
 
         $chatConnectionId = $request->get('conn_id');
 
-        $messages = ChatMessage::with([])->where([
+        $messages = ChatMessage::with(['parent'])->where([
             'deleted_at' => null,
             'chat_connection_id' => $chatConnectionId
         ])->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
