@@ -205,10 +205,10 @@ class ChatController extends Controller
      */
     public function fetchMessages(Request $request): \Illuminate\Http\JsonResponse {
         $this->validate($request, [
-            'chat_connection_id' => 'required',
+            'conn_id' => 'required',
         ]);
 
-        $chatConnectionId = $request->get('chat_connection_id');
+        $chatConnectionId = $request->get('conn_id');
 
         $messages = ChatMessage::with([])->where([
             'deleted_at' => null,

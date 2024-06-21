@@ -65,7 +65,7 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::get('fetch-chat-connections', [\App\Http\Controllers\ChatController::class, 'fetchChatConnections']);
     Route::get('get-chat-connection/{id}', [\App\Http\Controllers\ChatController::class, 'getChatConnection']);
     Route::post('send-message', [\App\Http\Controllers\ChatController::class, 'sendMessage']);
-    Route::post('fetch-messages', [\App\Http\Controllers\ChatController::class, 'fetchMessages']);
+    Route::get('fetch-messages', [\App\Http\Controllers\ChatController::class, 'fetchMessages']);
     Route::post('delete-message', [\App\Http\Controllers\ChatController::class, 'deleteMessage']);
 });
 
