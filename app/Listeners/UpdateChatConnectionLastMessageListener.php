@@ -8,6 +8,7 @@ use App\Events\NotificationsUpdatedEvent;
 use App\Models\ChatConnection;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class UpdateChatConnectionLastMessageListener
 {
@@ -29,6 +30,10 @@ class UpdateChatConnectionLastMessageListener
      */
     public function handle(ChatMessageCreatedEvent $event)
     {
+        Log::info("UpdateChatConnectionLastMessageListener called....");
+        Log::info("event chatConnectionId: " . $event->message->{'chat_connection_id'});
+        Log::info("event messageId: " . $event->message->{'id'});
+
         $chatConnectionId =  $event->message->{'chat_connection_id'};
         $chatConnection = ChatConnection::with(['participants'])->find($chatConnectionId);
         $chatConnection->update([
