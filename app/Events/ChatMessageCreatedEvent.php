@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class ChatMessageCreatedEvent
+class ChatMessageCreatedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -27,12 +27,12 @@ class ChatMessageCreatedEvent
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return Channel|array
+     * @return Channel
      */
-    public function broadcastOn(): Channel|array
+    public function broadcastOn(): Channel
     {
-//        $broadcastId = 'connections.'.$this->message->{'chat_connection_id'}.'.messages.'.$this->message->{'sent_to_id'}.'.created';
-        $broadcastId = 'users';
+        $broadcastId = 'connections.'.$this->message->{'chat_connection_id'}.'.messages.'.$this->message->{'sent_to_id'}.'.created';
+//        $broadcastId = 'users';
         Log::info("Broadcasting to $broadcastId");
         return new Channel($broadcastId); // sent_to_id is the user listening 's id
     }
