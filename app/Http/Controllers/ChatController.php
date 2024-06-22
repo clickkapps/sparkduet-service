@@ -133,13 +133,14 @@ class ChatController extends Controller
     public function fetchChatConnections(Request $request): \Illuminate\Http\JsonResponse {
 
         $user = $request->user();
+        $limit = $request->get("limit") ?: 15;
         // Get chat connections along with participants
         $chatConnections = $user->chatConnections()
             ->whereNull('deleted_at')
             ->with(['participants' => function($query) {
                 $query->withPivot('unread_messages');
             }, 'lastMessage'])
-            ->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
+            ->orderByDesc('created_at')->simplePaginate($limit);
 
         return response()->json(ApiResponse::successResponseWithData($chatConnections));
     }

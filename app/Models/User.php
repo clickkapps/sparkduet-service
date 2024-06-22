@@ -77,7 +77,8 @@ class User extends Authenticatable
 
     public function chatConnections(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(ChatConnection::class, 'chat_participants','user_id', 'chat_connection_id');
+        return $this->belongsToMany(ChatConnection::class, 'chat_participants','user_id', 'chat_connection_id')
+            ->withPivot('unread_messages');
     }
 
 
