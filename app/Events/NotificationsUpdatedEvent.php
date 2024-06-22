@@ -31,7 +31,7 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      */
     public function broadcastOn(): Channel|PrivateChannel|array
     {
-        return new Channel('users.'.$this->userId.'.general-notifications');
+        return new Channel('notifications.'.$this->userId.'.general-notifications');
     }
 
     /**
