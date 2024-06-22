@@ -231,7 +231,7 @@ class ChatController extends Controller
     /**
      * @throws ValidationException
      */
-    public function markMessagesRead(Request $request) {
+    public function markMessagesRead(Request $request): \Illuminate\Http\JsonResponse {
 
         $this->validate($request, [
             'chat_connection_id' => 'required',
@@ -265,6 +265,7 @@ class ChatController extends Controller
 
         event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, userId: $opponentId, messageIds: $msgIds));
 //        event(new UnreadChatMessagesUpdatedEvent(userId: $user->{'id'}, chatConnectionId: $chatConnectionId, count: 0));
+        return response()->json(ApiResponse::successResponse());
 
     }
 
