@@ -42,36 +42,6 @@ class ChatController extends Controller
     /**
      * @throws ValidationException
      */
-    public function messageCreated(Request $request): \Illuminate\Http\JsonResponse
-    {
-
-        Log::info("messageCreated in controller called..");
-        $this->validate($request, [
-           'sender_id' => 'required',
-           'recipient_id' => 'required',
-           'chat_connection_id' => 'required',
-        ]);
-        $senderId = $request->get('sender_id');
-        $recipientId = $request->get('recipient_id');
-        $chatConnectionId = $request->get('chat_connection_id');
-
-        $sender = User::with([])->find($senderId);
-        $recipient =  User::with([])->find($recipientId);
-
-        if(blank($sender) || blank($recipient)) {
-            Log::info("invalid sender or recipient");
-            return response()->json(ApiResponse::failedResponse("Invalid request"));
-        }
-
-        $recipient->notify(new ChatMessageCreated(sender: $sender,  chatConnectionId: $chatConnectionId));
-
-        return response()->json(ApiResponse::successResponse());
-
-    }
-
-    /**
-     * @throws ValidationException
-     */
     public function createChatConnection(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->validate($request, [
@@ -264,7 +234,6 @@ class ChatController extends Controller
         $q2->update(['seen_at' => now()]);
 
         event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, userId: $opponentId, messageIds: $msgIds));
-//        event(new UnreadChatMessagesUpdatedEvent(userId: $user->{'id'}, chatConnectionId: $chatConnectionId, count: 0));
         return response()->json(ApiResponse::successResponse());
 
     }

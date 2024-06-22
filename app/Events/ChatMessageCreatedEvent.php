@@ -31,7 +31,8 @@ class ChatMessageCreatedEvent
      */
     public function broadcastOn(): Channel|array
     {
-        $broadcastId = 'connections.'.$this->message->{'chat_connection_id'}.'.messages.'.$this->message->{'sent_to_id'}.'.created';
+//        $broadcastId = 'connections.'.$this->message->{'chat_connection_id'}.'.messages.'.$this->message->{'sent_to_id'}.'.created';
+        $broadcastId = 'users';
         Log::info("Broadcasting to $broadcastId");
         return new Channel($broadcastId); // sent_to_id is the user listening 's id
     }
