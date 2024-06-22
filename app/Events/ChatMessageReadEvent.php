@@ -19,7 +19,7 @@ class ChatMessageReadEvent
      *
      * @return void
      */
-    public function __construct(public int $chatConnectionId, public array $messageIds)
+    public function __construct(public int $chatConnectionId, public int $userId, public $messageIds)
     {
         //
     }
@@ -31,6 +31,6 @@ class ChatMessageReadEvent
      */
     public function broadcastOn()
     {
-        return new Channel('connections.'.$this->chatConnectionId.'.messages.read');
+        return new Channel('connections.'.$this->chatConnectionId.'.user.'.$this->userId.'.messages.read');
     }
 }

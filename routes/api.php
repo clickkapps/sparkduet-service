@@ -67,6 +67,7 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::post('send-message', [\App\Http\Controllers\ChatController::class, 'sendMessage']);
     Route::get('fetch-messages', [\App\Http\Controllers\ChatController::class, 'fetchMessages']);
     Route::post('delete-message', [\App\Http\Controllers\ChatController::class, 'deleteMessage']);
+    Route::post('mark-messages-as-read', [\App\Http\Controllers\ChatController::class, 'markMessagesRead']);
 });
 
 /*

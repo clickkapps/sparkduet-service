@@ -8,6 +8,7 @@ use App\Events\ChatConnectionDeletedEvent;
 use App\Events\ChatMessageCreatedEvent;
 use App\Events\ChatMessageDeletedEvent;
 use App\Events\ChatMessageReadEvent;
+use App\Events\UnreadChatMessagesUpdatedEvent;
 use App\Models\ChatConnection;
 use App\Models\ChatMessage;
 use App\Models\ChatParticipant;
@@ -191,7 +192,7 @@ class ChatController extends Controller
         ])->first();
         $unreadMessagesCount = $participant->{'unread_messages'};
         $participant->update([
-            $unreadMessagesCount
+            'unread_messages' => $unreadMessagesCount + 1
         ]);
 
         $connection = ChatConnection::with(['participants'])->find($chatConnectionId);
@@ -231,17 +232,36 @@ class ChatController extends Controller
 
         $this->validate($request, [
             'chat_connection_id' => 'required',
-            'message_ids' => 'required|array'
+            'opponent_id' => 'required'
         ]);
 
-        $messageIds = $request->get('message_ids');
+        $user = $request->user();
         $chatConnectionId = $request->get('chat_connection_id');
+        $opponentId = $request->get('opponent_id');
 
-        ChatMessage::with([])->whereIn('id', $messageIds)->update(['seen_at' => now()]);
-//        $message->update(['seen_at' => now()]);
-//        $message->refresh();
+        $participant = ChatParticipant::with([])->where([
+            'user_id' => $user->{'id'},
+            'chat_connection_id' => $chatConnectionId
+        ])->first();
+        $participant->update([
+            'unread_messages' => 0
+        ]);
 
-        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, messageIds: $messageIds));
+        $query = ChatMessage::with([])
+            ->where([
+                'chat_connection_id' => $chatConnectionId,
+                'sent_to_id' => $user->{'id'},
+                'seen_at' => null
+            ]);
+        $q1 = clone $query;
+        $q2 = clone $query;
+        $msgIds = $q1->pluck('id');
+
+
+        $q2->update(['seen_at' => now()]);
+
+        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, userId: $opponentId, messageIds: $msgIds));
+        event(new UnreadChatMessagesUpdatedEvent(userId: $user->{'id'}, chatConnectionId: $chatConnectionId, count: 0));
 
     }
 
