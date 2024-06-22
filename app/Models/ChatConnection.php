@@ -20,7 +20,8 @@ class ChatConnection extends Model
     ];
 
     public function participants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
-        return $this->belongsToMany(User::class,'chat_participants', 'chat_connection_id', 'user_id' );
+        return $this->belongsToMany(User::class,'chat_participants', 'chat_connection_id', 'user_id' )
+            ->withPivot('unread_messages');
     }
 
     public function lastMessage(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
