@@ -264,7 +264,7 @@ class ChatController extends Controller
         $q2->update(['seen_at' => now()]);
 
         event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, userId: $opponentId, messageIds: $msgIds));
-        event(new UnreadChatMessagesUpdatedEvent(userId: $user->{'id'}, chatConnectionId: $chatConnectionId, count: 0));
+//        event(new UnreadChatMessagesUpdatedEvent(userId: $user->{'id'}, chatConnectionId: $chatConnectionId, count: 0));
 
     }
 
