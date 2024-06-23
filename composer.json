@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2.12",
+        "ably/ably-php": "^1.1",
         "algolia/algoliasearch-client-php": "^3.4",
         "algolia/scout-extended": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
