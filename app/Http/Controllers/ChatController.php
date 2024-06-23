@@ -275,6 +275,15 @@ class ChatController extends Controller
 
     }
 
+    public function getTotalUnreadChatMessages(Request $request): \Illuminate\Http\JsonResponse
+    {
+         $user = $request->user();
+        $totalUnreadMessages = ChatParticipant::with([])->where([
+            'user_id' => $user->id,
+        ])->sum('unread_messages');
+        return response()->json(ApiResponse::successResponseWithData($totalUnreadMessages));
+    }
+
 
 
 
