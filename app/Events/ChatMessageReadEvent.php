@@ -19,7 +19,7 @@ class ChatMessageReadEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(private int $chatConnectionId, private int $opponentId, public $messageIds)
+    public function __construct(private int $chatConnectionId, private int $opponentId, public $messageIds, public $seenAt)
     {
         //
     }

@@ -210,7 +210,7 @@ class ChatController extends Controller
 
         $user = $request->user();
         $chatConnectionId = $request->get('chat_connection_id');
-        $opponentId = $request->get('opponent_id');
+        $senderId = $request->get('opponent_id');
 
         $participant = ChatParticipant::with([])->where([
             'user_id' => $user->{'id'},
@@ -226,14 +226,14 @@ class ChatController extends Controller
                 'sent_to_id' => $user->{'id'},
                 'seen_at' => null
             ]);
-        $q1 = clone $query;
+        $q1 = clone  $query;
         $q2 = clone $query;
-        $msgIds = $q1->pluck('id');
+        $now = now();
+        $messageIds = $q2->pluck('id');
+        $q1->update(['seen_at' => $now]);
 
 
-        $q2->update(['seen_at' => now()]);
-
-        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, opponentId: $opponentId, messageIds: $msgIds));
+        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, opponentId: $senderId, messageIds: $messageIds, seenAt: $now));
         return response()->json(ApiResponse::successResponse());
 
     }
