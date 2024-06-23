@@ -36,4 +36,14 @@ class ChatMessageCreatedEvent implements ShouldBroadcast
         Log::info("Broadcasting to $broadcastId");
         return new Channel($broadcastId); // sent_to_id is the user listening 's id
     }
+
+    /**
+     * The event's broadcast name.
+     *
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        return 'message.created';
+    }
 }
