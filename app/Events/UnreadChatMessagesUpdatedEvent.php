@@ -32,6 +32,6 @@ class UnreadChatMessagesUpdatedEvent
      */
     public function broadcastOn(): Channel|array
     {
-        return new Channel('user.'.$this->userId.'.connections.'.$this->chatConnectionId.'.unread-messages-count');
+        return new Channel('user.'.$this->userId.'.unread-chat-messages-count-updated');
     }
 }

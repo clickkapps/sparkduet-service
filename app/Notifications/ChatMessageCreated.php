@@ -17,7 +17,7 @@ class ChatMessageCreated extends Notification
      *
      * @return void
      */
-    public function __construct(private $sender, private readonly string $chatConnectionId, private readonly int $unreadMessagesCount = 0)
+    public function __construct(private $sender, private string $chatConnectionId, private int $unreadMessagesCount = 0)
     { }
 
     /**
