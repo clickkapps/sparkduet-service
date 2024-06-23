@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChatMessageReadEvent
+class ChatMessageReadEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,7 +19,7 @@ class ChatMessageReadEvent
      *
      * @return void
      */
-    public function __construct(public int $chatConnectionId, public int $userId, public $messageIds)
+    public function __construct(private int $chatConnectionId, private int $opponentId, public $messageIds)
     {
         //
     }
@@ -31,6 +31,6 @@ class ChatMessageReadEvent
      */
     public function broadcastOn()
     {
-        return new Channel('connections.'.$this->chatConnectionId.'.user.'.$this->userId.'.messages.read');
+        return new Channel('connections.'.$this->chatConnectionId.'.user.'.$this->opponentId.'.messages.read');
     }
 }

@@ -233,7 +233,7 @@ class ChatController extends Controller
 
         $q2->update(['seen_at' => now()]);
 
-        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, userId: $opponentId, messageIds: $msgIds));
+        event(new ChatMessageReadEvent(chatConnectionId: $chatConnectionId, opponentId: $opponentId, messageIds: $msgIds));
         return response()->json(ApiResponse::successResponse());
 
     }
