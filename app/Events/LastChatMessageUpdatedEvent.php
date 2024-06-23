@@ -20,7 +20,7 @@ class LastChatMessageUpdatedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $chatConnection, private int $opponentId)
+    public function __construct(public $message, private int $opponentId)
     {}
 
     /**

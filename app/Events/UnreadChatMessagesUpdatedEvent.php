@@ -20,7 +20,7 @@ class UnreadChatMessagesUpdatedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public int $userId, public int $chatConnectionId,public int $count)
+    public function __construct(private int $userId, public int $chatConnectionId,public int $count)
     {
         //
     }

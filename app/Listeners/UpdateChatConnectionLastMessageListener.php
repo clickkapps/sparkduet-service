@@ -39,8 +39,9 @@ class UpdateChatConnectionLastMessageListener implements ShouldQueue
 
         $chatConnection->refresh();
         $opponentId = $event->message->{'sent_to_id'};
+        $lastMessage = $chatConnection->{'lastMessage'};
 
-        event(new LastChatMessageUpdatedEvent(chatConnection: $chatConnection, opponentId: $opponentId));
+        event(new LastChatMessageUpdatedEvent(message: $lastMessage, opponentId: $opponentId));
 
     }
 }
