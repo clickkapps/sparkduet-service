@@ -20,7 +20,7 @@ class LastChatMessageUpdatedEvent
      *
      * @return void
      */
-    public function __construct(public $chatConnection)
+    public function __construct(public $chatConnection, private int $opponentId)
     {}
 
     /**
@@ -30,6 +30,6 @@ class LastChatMessageUpdatedEvent
      */
     public function broadcastOn(): Channel|array
     {
-        return new Channel('connection.last-message-updated');
+        return new Channel('user.'.$this->opponentId.'.last-chat-message-updated');
     }
 }
