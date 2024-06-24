@@ -120,7 +120,8 @@ class ChatController extends Controller
     public function getChatConnectionById(Request $request, $id): \Illuminate\Http\JsonResponse {
 
         Log::info('chatConnectionId: ' . $id);
-        $chatConnection = ChatConnection::with([
+        $user = $request->user();
+        $chatConnection = $user->chatConnections()->with([
             'participants' => function($query) {
                 $query->withPivot('unread_messages');
             },
