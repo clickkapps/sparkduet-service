@@ -8,6 +8,7 @@ use App\Events\ChatConnectionDeletedEvent;
 use App\Events\ChatMessageCreatedEvent;
 use App\Events\ChatMessageDeletedEvent;
 use App\Events\ChatMessageReadEvent;
+use App\Events\LastChatMessageUpdatedEvent;
 use App\Events\UnreadChatMessagesUpdatedEvent;
 use App\Models\ChatConnection;
 use App\Models\ChatMessage;
@@ -251,10 +252,37 @@ class ChatController extends Controller
 
         $messageId = $request->get('message_id');
         $opponentId = $request->get('opponent_id');
+        $user = $request->user();
 
-        $message = ChatMessage::with([])->find($messageId);
+        $message = ChatMessage::with(['parent'])->find($messageId);
         $message->update(['deleted_at' => now()]);
+        $message->refresh();
+
+        // check if it's the last chat message, if yes raise the LastChatMessageUpdatedEvent
+        $connection = ChatConnection::with([])->find($message->{'chat_connection_id'});
+        if($connection->{'chat_message_id'} == $message->{'id'}) {
+            // its last message
+            event(new LastChatMessageUpdatedEvent(message: $message, opponentId: $opponentId));
+        }
+
+        // check if the seen_at is not equal to null, if its null
+        //  - reduce the unread_messages count and raise UnreadChatMessagesUpdatedEvent
+        //  - count the total unread and raise the TotalUnreadChatMessagesUpdatedEvent
+        if($message->{'sent_by_id'} == $user->id) { // if the message was sent by me
+            if(blank($message->{'seen_at'})) {// and the user has not read it yet
+                $participant = ChatParticipant::with([])->where([
+                    'user_id' => $opponentId,
+                    'chat_connection_id' => $connection->{'id'}
+                ])->first();
+                $unreadMessages = $participant->{'unread_messages'};
+                $newUnreadMessage = ($unreadMessages ?? 1) - 1;
+                $participant->update(['unread_messages' => $newUnreadMessage,]);
+            }
+
+        }
+
         event(new ChatMessageDeletedEvent(message: $message, opponentId: $opponentId));
+
         return response()->json(ApiResponse::successResponse());
     }
 

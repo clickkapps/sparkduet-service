@@ -26,10 +26,10 @@ class CountUnreadChatMessagesForOpponentListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  \App\Events\ChatMessageCreatedEvent  $event
+     * @param   $event
      * @return void
      */
-    public function handle(ChatMessageCreatedEvent $event)
+    public function handle($event)
     {
         Log::info('CountUnreadChatMessagesForOpponentListener called...');
         $opponentId = $event->message->{'sent_to_id'};

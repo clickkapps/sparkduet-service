@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\ChatMessageCreatedEvent;
+use App\Events\ChatMessageDeletedEvent;
 use App\Listeners\CountUnreadChatMessagesForOpponentListener;
 use App\Listeners\SendPushToChatOpponentListener;
 use App\Listeners\UpdateChatConnectionLastMessageListener;
@@ -32,6 +33,9 @@ class EventServiceProvider extends ServiceProvider
         ChatMessageCreatedEvent::class => [
             UpdateChatConnectionLastMessageListener::class,
             SendPushToChatOpponentListener::class,
+            CountUnreadChatMessagesForOpponentListener::class,
+        ],
+        ChatMessageDeletedEvent::class => [
             CountUnreadChatMessagesForOpponentListener::class,
         ]
     ];
