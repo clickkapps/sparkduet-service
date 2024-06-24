@@ -119,9 +119,17 @@ class ChatController extends Controller
 
     public function getChatConnectionById(Request $request, $id): \Illuminate\Http\JsonResponse {
 
-        $chatConnection = ChatConnection::with(['participants' => function($query) {
-            $query->withPivot('unread_messages');
-        }, 'lastMessage'])->whereNull('deleted_at')->find($id);
+        Log::info('chatConnectionId: ' . $id);
+        $chatConnection = ChatConnection::with([
+            'participants' => function($query) {
+                $query->withPivot('unread_messages');
+            },
+            'lastMessage'
+        ])
+            ->whereNull('deleted_at')
+            ->find($id);
+
+        Log::info('chatConnection: ' . json_encode($chatConnection));
 
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
 
