@@ -117,10 +117,12 @@ class ChatController extends Controller
         return response()->json(ApiResponse::successResponseWithData($chatConnections));
     }
 
-    public function getChatConnection(Request $request, $id): \Illuminate\Http\JsonResponse {
+    public function getChatConnectionById(Request $request, $id): \Illuminate\Http\JsonResponse {
+
         $chatConnection = ChatConnection::with(['participants' => function($query) {
             $query->withPivot('unread_messages');
         }, 'lastMessage'])->whereNull('deleted_at')->find($id);
+
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
 
     }
