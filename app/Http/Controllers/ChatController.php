@@ -119,7 +119,7 @@ class ChatController extends Controller
 
     public function getChatConnection(Request $request, $id): \Illuminate\Http\JsonResponse {
 
-        $chatConnection = ChatConnection::with(['participant'])->whereNull('deleted_at')->find($id);
+        $chatConnection = ChatConnection::with(['participants', 'lastMessage'])->whereNull('deleted_at')->find($id);
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
 
     }
@@ -311,7 +311,7 @@ class ChatController extends Controller
         $chatConnection->refresh();
 
         // mark it as deleted for both parties
-        $participant = ChatParticipant::with([])->where([
+         ChatParticipant::with([])->where([
             'chat_connection_id' => $chatConnectionId
         ])->update(['unread_messages' => 0,]);
 
