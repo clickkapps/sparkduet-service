@@ -178,7 +178,7 @@ class ChatController extends Controller
         }
 
         event(new ChatMessageCreatedEvent(message: $message));
-        event(new CountUnreadMessagesEvent(chatConnectionId: $message->{'sent_to_id'}, userId: $message->{'sent_to_id'}));
+        event(new CountUnreadMessagesEvent(chatConnectionId: $chatConnectionId, userId: $message->{'sent_to_id'}));
 
         return response()->json(ApiResponse::successResponseWithData($message));
 

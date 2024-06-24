@@ -19,7 +19,7 @@ class ChatMessageDeletedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $message, public int $opponentId)
+    public function __construct(public $message, private int $opponentId)
     {
         //
     }
