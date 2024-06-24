@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponse;
 use App\Events\ChatConnectionCreatedEvent;
 use App\Events\ChatConnectionDeletedEvent;
+use App\Events\ChatConnectionsMatchedEvent;
 use App\Events\ChatMessageCreatedEvent;
 use App\Events\ChatMessageDeletedEvent;
 use App\Events\ChatMessageReadEvent;
@@ -119,7 +120,6 @@ class ChatController extends Controller
 
     public function getChatConnectionById(Request $request, $id): \Illuminate\Http\JsonResponse {
 
-        Log::info('chatConnectionId: ' . $id);
         $user = $request->user();
         $chatConnection = $user->chatConnections()->with([
             'participants' => function($query) {
@@ -129,8 +129,6 @@ class ChatController extends Controller
         ])
             ->whereNull('deleted_at')
             ->find($id);
-
-        Log::info('chatConnection: ' . json_encode($chatConnection));
 
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
 
@@ -191,6 +189,17 @@ class ChatController extends Controller
 
         event(new ChatMessageCreatedEvent(message: $message));
         event(new CountUnreadMessagesEvent(chatConnectionId: $chatConnectionId, userId: $message->{'sent_to_id'}));
+
+//        if matched_at in $connection is null,
+//        check if this message is a reply, if it is, update matched_at and emit matched at event
+        if(blank($connection->{'matched_at'})) {
+            if($message->{'sent_to_id'} == $connection->{'created_by'}){ // if this condition passes, then its a reply
+                $now = now();
+                $connection->update(['matched_at' => $now]);
+                event(new ChatConnectionsMatchedEvent(creatorId: $connection->{'created_by'}, connectionId: $chatConnectionId, matchedAt: $now));
+
+            }
+        }
 
         return response()->json(ApiResponse::successResponseWithData($message));
 
