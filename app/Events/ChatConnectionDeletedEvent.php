@@ -29,6 +29,6 @@ class ChatConnectionDeletedEvent implements ShouldBroadcast
      */
     public function broadcastOn(): Channel
     {
-        return new Channel('connection.'.$this->chatConnectionId.'.user.'.$this->userId.'.deleted');
+        return new Channel('connection.user.'.$this->userId.'.deleted');
     }
 }
