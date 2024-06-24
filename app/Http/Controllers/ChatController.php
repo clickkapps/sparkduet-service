@@ -8,6 +8,7 @@ use App\Events\ChatConnectionDeletedEvent;
 use App\Events\ChatMessageCreatedEvent;
 use App\Events\ChatMessageDeletedEvent;
 use App\Events\ChatMessageReadEvent;
+use App\Events\CountUnreadMessagesEvent;
 use App\Events\LastChatMessageUpdatedEvent;
 use App\Events\UnreadChatMessagesUpdatedEvent;
 use App\Models\ChatConnection;
@@ -177,6 +178,7 @@ class ChatController extends Controller
         }
 
         event(new ChatMessageCreatedEvent(message: $message));
+        event(new CountUnreadMessagesEvent(chatConnectionId: $message->{'sent_to_id'}, userId: $message->{'sent_to_id'}));
 
         return response()->json(ApiResponse::successResponseWithData($message));
 
@@ -282,6 +284,7 @@ class ChatController extends Controller
         }
 
         event(new ChatMessageDeletedEvent(message: $message, opponentId: $opponentId));
+        event(new CountUnreadMessagesEvent(chatConnectionId: $connection->{'id'}, userId: $opponentId));
 
         return response()->json(ApiResponse::successResponse());
     }
@@ -289,17 +292,33 @@ class ChatController extends Controller
     /**
      * @throws ValidationException
      */
-    public function deleteChatConnection(Request $request) {
+    public function deleteChatConnection(Request $request): \Illuminate\Http\JsonResponse {
         $this->validate($request, [
-            'chat_connection_id' => 'required'
+            'chat_connection_id' => 'required',
+            'opponent_id' => 'required',
         ]);
 
+        $opponentId = $request->get('opponent_id');
         $chatConnectionId = $request->get('chat_connection_id');
         $chatConnection = ChatConnection::with(['participants'])->find($chatConnectionId);
         $chatConnection->update(['deleted_at' => now()]);
+
+        // mark all related chat messages as deleted
+        ChatMessage::with(['parent'])->where([
+            'chat_connection_id' => $chatConnectionId
+        ])->update(['deleted_at' => now()]);
+
         $chatConnection->refresh();
 
-        event(new ChatConnectionDeletedEvent(chatConnection: $chatConnection));
+        // mark it as deleted for both parties
+        $participant = ChatParticipant::with([])->where([
+            'chat_connection_id' => $chatConnectionId
+        ])->update(['unread_messages' => 0,]);
+
+        event(new ChatConnectionDeletedEvent(userId: $opponentId, chatConnectionId: $chatConnectionId));
+        event(new CountUnreadMessagesEvent(chatConnectionId: $chatConnectionId, userId: $opponentId));
+
+        return response()->json(ApiResponse::successResponse());
 
     }
 

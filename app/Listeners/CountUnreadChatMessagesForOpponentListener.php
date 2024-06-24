@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\ChatMessageCreatedEvent;
+use App\Events\CountUnreadMessagesEvent;
 use App\Events\TotalUnreadChatMessagesUpdatedEvent;
 use App\Events\UnreadChatMessagesUpdatedEvent;
 use App\Models\ChatParticipant;
@@ -26,14 +27,17 @@ class CountUnreadChatMessagesForOpponentListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param   $event
+     * @param CountUnreadMessagesEvent $event
      * @return void
      */
-    public function handle($event)
+    public function handle(CountUnreadMessagesEvent $event): void
     {
         Log::info('CountUnreadChatMessagesForOpponentListener called...');
-        $opponentId = $event->message->{'sent_to_id'};
-        $chatConnectionId = $event->message->{'chat_connection_id'};
+//        $opponentId = $event->message->{'sent_to_id'};
+//        $chatConnectionId = $event->message->{'chat_connection_id'};
+
+        $opponentId = $event->userId;
+        $chatConnectionId = $event->chatConnectionId;
 
         $participant = ChatParticipant::with([])->where([
             'user_id' => $opponentId,

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChatConnectionDeletedEvent implements ShouldBroadcast
+class CountUnreadMessagesEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,16 +19,16 @@ class ChatConnectionDeletedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(private int $userId, public int $chatConnectionId)
+    public function __construct(public int $chatConnectionId, public int $userId)
     {}
 
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return Channel
+     * @return \Illuminate\Broadcasting\Channel|array
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
-        return new Channel('connection.'.$this->chatConnectionId.'.user.'.$this->userId.'.deleted');
+        return new PrivateChannel('channel-name');
     }
 }
