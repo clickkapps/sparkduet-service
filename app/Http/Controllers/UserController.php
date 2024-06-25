@@ -55,7 +55,7 @@ class UserController extends Controller
     {
 //        $profileOwner = $request->user();
         $ids = $request->get('ids'); // profile_views table ids
-        if(blank($ids) || !is_array($ids) ) {
+        if(blank($ids)) {
             throw new \Exception("Invalid request");
         }
         DB::table('profile_views')->whereIn('id', $ids)->update([
