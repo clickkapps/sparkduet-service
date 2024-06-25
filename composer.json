@@ -9,7 +9,7 @@
         "ably/ably-php": "^1.1",
         "algolia/algoliasearch-client-php": "^3.4",
         "algolia/scout-extended": "^2.0",
-        "doctrine/dbal": "^4.0",
+        "doctrine/dbal": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
         "kreait/laravel-firebase": "^5.8",
         "laravel-notification-channels/telegram": "^3.0",
