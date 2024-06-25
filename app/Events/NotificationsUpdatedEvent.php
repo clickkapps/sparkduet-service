@@ -33,25 +33,4 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
     {
         return new Channel('users.'.$this->userId.'.general-notifications');
     }
-
-    /**
-     * The event's broadcast name.
-     *
-     * @return string
-     */
-    public function broadcastAs(): string
-    {
-        return 'notifications.count.updated';
-    }
-
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array
-     */
-    #[ArrayShape(["count" => "int"])]
-    public function broadcastWith(): array {
-
-        return ["count" => $this->count];
-    }
 }
