@@ -17,7 +17,7 @@ class NotificationsController extends Controller
         Log::info('fetchNotifications called .....xxxx...');
         $user = $request->user();
         $limit = $request->get('limit') ?: 15;
-        $userNotifications = $user->unreadNotifications()->with('user')->simplePaginate($limit);
+        $userNotifications = $user->userNotifications()->with('user')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($userNotifications));
     }
 
@@ -34,7 +34,7 @@ class NotificationsController extends Controller
     public function markNotificationsAsSeen(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        $user->unreadNotifications()->whereNull('seen_at')->update([
+        $user->userNotifications()->whereNull('seen_at')->update([
            'seen_at' => now()
         ]);
         return response()->json(ApiResponse::successResponse());
