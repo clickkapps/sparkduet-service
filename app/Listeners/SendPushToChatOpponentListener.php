@@ -30,7 +30,6 @@ class SendPushToChatOpponentListener implements ShouldQueue
      */
     public function handle(ChatMessageCreatedEvent $event)
     {
-        Log::info('SendPushToChatOpponentListener called...');
         $opponentId = $event->message->{'sent_to_id'};
         $senderId = $event->message->{'sent_by_id'};
         $chatConnectionId = $event->message->{'chat_connection_id'};

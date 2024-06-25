@@ -20,9 +20,7 @@ class UserProfileViewsEvaluated extends Notification
      * @return void
      */
     public function __construct(public string $message)
-    {
-        //
-    }
+    {}
 
     /**
      * Get the notification's delivery channels.
@@ -47,8 +45,7 @@ class UserProfileViewsEvaluated extends Notification
         return [
             "userId" => $notifiable->{'username'},
             'title' =>  'New profile views',
-            'message' => "Sent you a message", // we do this to hide the message.
-            'unread' => $this->message,
+            'message' => $this->message, // we do this to hide the message.
             'data' => [
                 'pushType' => 'profile_views'
             ]
