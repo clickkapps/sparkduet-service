@@ -34,8 +34,9 @@ class UserController extends Controller
 
         $exists = DB::table('profile_views')->where([
             'viewer_id' => $viewerId,
-            'profile_id' => $profileId
-        ])->exists();
+            'profile_id' => $profileId,
+        ])->whereNotNull('profile_owner_read_at')
+            ->exists();
         if(!$exists) {
             DB::table('profile_views')->insert([
                 'viewer_id' => $viewerId,
