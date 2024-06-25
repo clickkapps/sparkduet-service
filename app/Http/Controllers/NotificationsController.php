@@ -7,12 +7,14 @@ use App\Events\NotificationsUpdatedEvent;
 use App\Models\UserNotification;
 use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class NotificationsController extends Controller
 {
     use NotificationTrait;
     public function fetchNotifications(Request $request): \Illuminate\Http\JsonResponse
     {
+        Log::info('fetchNotifications called .....xxxx...');
         $user = $request->user();
         $limit = $request->get('limit') ?: 15;
         $userNotifications = $user->unreadNotifications()->with('user')->simplePaginate($limit);
