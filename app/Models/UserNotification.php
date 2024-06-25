@@ -16,4 +16,9 @@ class UserNotification extends Model
        'seen_at',
        'type'
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

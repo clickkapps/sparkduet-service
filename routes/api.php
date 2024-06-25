@@ -153,8 +153,11 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
 | Notifications routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('notification')->middleware('basicAuth')->group(function () {
-    Route::post('/', [\App\Http\Controllers\NotificationsController::class, 'fetchNotifications']);
+Route::prefix('notifications')->middleware('basicAuth')->group(function () {
+    Route::get('/', [\App\Http\Controllers\NotificationsController::class, 'fetchNotifications']);
+    Route::get('/unseen-count', [\App\Http\Controllers\NotificationsController::class, 'getUnseenNotificationsCount']);
+    Route::post('/mark-as-seen', [\App\Http\Controllers\NotificationsController::class, 'markNotificationsAsSeen']);
+    Route::post('/mark-as-read/{id}', [\App\Http\Controllers\NotificationsController::class, 'markNotificationAsRead']);
 });
 
 /*

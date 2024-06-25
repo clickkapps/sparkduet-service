@@ -9,7 +9,7 @@ trait NotificationTrait
 {
     protected function countUnseenNotifications($user) {
 
-        return $user->unreadNotifications()->where(['seen_at' => null])->count();
+        return $user->userNotifications()->where(['seen_at' => null])->count();
 
 //        event(new NotificationsUpdatedEvent(1,24));
     }
