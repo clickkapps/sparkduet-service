@@ -9,8 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-//implements ShouldQueue
-class UserProfileViewsEvaluated extends Notification
+class UserProfileViewsEvaluated extends Notification implements ShouldQueue
 {
     use Queueable;
 
