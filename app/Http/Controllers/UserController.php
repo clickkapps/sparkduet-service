@@ -161,6 +161,7 @@ class UserController extends Controller
 
     // Any notice served to the user by the admin
     public function getUserNotice(Request $request): JsonResponse {
+
         $user = $request->user();
         $notice = UserNotice::with('user')->where([
             'user_id' => $user->{'id'},

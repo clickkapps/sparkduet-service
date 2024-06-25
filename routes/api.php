@@ -46,7 +46,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('fetch-unread-profile-viewers', [\App\Http\Controllers\UserController::class, 'fetchUnreadProfileViewers']);
     Route::get('count-unread-profile-views', [\App\Http\Controllers\UserController::class, 'countUnreadProfileViews']);
     Route::get('get-notice', [\App\Http\Controllers\UserController::class, 'getUserNotice']);
-    Route::post('get-notice', [\App\Http\Controllers\UserController::class, 'markNoticeAsRead']);
+    Route::post('mark-notice-as-read', [\App\Http\Controllers\UserController::class, 'markNoticeAsRead']);
     Route::post('report-user', [\App\Http\Controllers\UserController::class, 'reportUser']);
     Route::post('block-user', [\App\Http\Controllers\UserController::class, 'userBlocksOffender']);
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
@@ -155,7 +155,7 @@ Route::prefix('search')->middleware('auth:sanctum')->group(function () {
 */
 Route::prefix('notifications')->middleware('basicAuth')->group(function () {
     Route::get('/', [\App\Http\Controllers\NotificationsController::class, 'fetchNotifications']);
-    Route::get('/unseen-count', [\App\Http\Controllers\NotificationsController::class, 'getUnseenNotificationsCount']);
+    Route::get('/count-unseen-count', [\App\Http\Controllers\NotificationsController::class, 'getCountUnseenNotificationsCount']);
     Route::post('/mark-as-seen', [\App\Http\Controllers\NotificationsController::class, 'markNotificationsAsSeen']);
     Route::post('/mark-as-read/{id}', [\App\Http\Controllers\NotificationsController::class, 'markNotificationAsRead']);
 });

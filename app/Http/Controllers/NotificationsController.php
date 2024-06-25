@@ -18,7 +18,7 @@ class NotificationsController extends Controller
         return response()->json(ApiResponse::successResponseWithData($userNotifications));
     }
 
-    public function getUnseenNotificationsCount(Request $request): \Illuminate\Http\JsonResponse
+    public function getCountUnseenNotificationsCount(Request $request): \Illuminate\Http\JsonResponse
     {
 
         $user = $request->user();
