@@ -82,7 +82,7 @@ class User extends Authenticatable
     }
 
     public function userNotifications(): \Illuminate\Database\Eloquent\Relations\HasMany {
-        return $this->hasMany(UserNotification::class);
+        return $this->hasMany(UserNotification::class, 'user_id', 'id');
     }
 
 
