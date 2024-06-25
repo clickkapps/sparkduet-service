@@ -20,7 +20,7 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public int $userId,public int $count)
+    public function __construct(private int $userId, public int $count)
     {
     }
 
@@ -31,6 +31,6 @@ class NotificationsUpdatedEvent implements ShouldBroadcast
      */
     public function broadcastOn(): Channel|PrivateChannel|array
     {
-        return new Channel('users.'.$this->userId.'.general-notifications');
+        return new Channel('users.'.$this->userId.'.count-general-unseen-notifications');
     }
 }
