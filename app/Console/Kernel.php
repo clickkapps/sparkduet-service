@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
             Log::info('cron is running');
         })->everyTwoHours();
         $schedule->command('disposable:update')->weekly();
-        $schedule->command(EvaluateProfileViews::class)->fridays();
+        $schedule->command(EvaluateProfileViews::class)->fridays()->at('16:00');
 
     }
 

@@ -14,10 +14,9 @@ class NotificationsController extends Controller
     use NotificationTrait;
     public function fetchNotifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        Log::info('fetchNotifications called .....xxxx...');
         $user = $request->user();
         $limit = $request->get('limit') ?: 15;
-        $userNotifications = $user->userNotifications()->with('user')->simplePaginate($limit);
+        $userNotifications = $user->userNotifications()->with('user')->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($userNotifications));
     }
 
