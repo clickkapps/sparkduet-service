@@ -14,7 +14,8 @@ class NotificationsController extends Controller
     public function fetchNotifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        $userNotifications = $user->unreadNotifications()->with('user')->get();
+        $limit = $request->get('limit') ?: 15;
+        $userNotifications = $user->unreadNotifications()->with('user')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($userNotifications));
     }
 
