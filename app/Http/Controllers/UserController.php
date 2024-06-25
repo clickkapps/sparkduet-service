@@ -70,8 +70,7 @@ class UserController extends Controller
 
         $paginated = ProfileView::with(['viewer', 'profile'])->where([
             'profile_id' => $profileOwner->{'id'},
-            'profile_owner_read_at' => null
-        ])->simplePaginate($request->get('limit') ?: 10 );
+        ])->orderByDesc('created_at')->simplePaginate($request->get('limit') ?: 10 );
 
         return response()->json(ApiResponse::successResponseWithData($paginated));
     }
