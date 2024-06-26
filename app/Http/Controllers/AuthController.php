@@ -437,14 +437,14 @@ class AuthController extends Controller
         $loc = $request->get('loc');
         $countryCode = $request->get('country_code');
 
-        $user->userInfo->update([
+        $user->userInfo()->update([
             'country' => $countryCode,
             'loc' => $loc,
         ]);
 
         if(blank($user->userInfo->{'preferred_nationalities'})) {
 
-            $user->userInfo->update([
+            $user->userInfo()->update([
                 'preferred_nationalities' => json_encode([
                     "key" => blank($countryCode) ? "all" : "only", //except / only / all
                     "values" => blank($countryCode) ? []: [
