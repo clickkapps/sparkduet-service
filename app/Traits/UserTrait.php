@@ -55,10 +55,10 @@ trait UserTrait
                 $userInfo->update($updateUserInfoPayload);
             }
 
-            if(blank($userInfo->{"preferred_nationalities"})){
-                $userIp = $request->ip();
-                $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
-            }
+//            if(blank($userInfo->{"preferred_nationalities"})){
+//                $userIp = $request->ip();
+//                $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
+//            }
         }
 
 

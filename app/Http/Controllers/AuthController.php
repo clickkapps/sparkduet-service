@@ -312,9 +312,9 @@ class AuthController extends Controller
         );
 
         // We need to this so we can fetch stories narrowed in the users country
-        if(blank($userInfo->{"preferred_nationalities"})){
-            $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
-        }
+//        if(blank($userInfo->{"preferred_nationalities"})){
+//            $this->setLocationInfo(userInfo: $userInfo, userIp:  $userIp);
+//        }
 
         $token = $user->createToken($email);
         Log::info('token: ' . json_encode($token));
