@@ -442,7 +442,7 @@ class AuthController extends Controller
             'loc' => $loc,
         ]);
 
-        if(blank($user->userInfo->{'preferred_nationalities'})) {
+        if(blank($user->info->{'preferred_nationalities'})) {
 
             $user->info()->update([
                 'preferred_nationalities' => json_encode([
