@@ -429,4 +429,34 @@ class AuthController extends Controller
         return response()->json(ApiResponse::successResponse());
     }
 
+
+    public function setupUserLocation(Request $request): JsonResponse
+    {
+
+        $user = $request->user();
+        $loc = $request->get('loc');
+        $countryCode = $request->get('country_code');
+
+        $user->userInfo->update([
+            'country' => $countryCode,
+            'loc' => $loc,
+        ]);
+
+        if(blank($user->userInfo->{'preferred_nationalities'})) {
+
+            $user->userInfo->update([
+                'preferred_nationalities' => json_encode([
+                    "key" => blank($countryCode) ? "all" : "only", //except / only / all
+                    "values" => blank($countryCode) ? []: [
+                        $countryCode
+                    ] // country codes
+                ]),
+            ]);
+
+        }
+
+        return $this->getUserProfile($request);
+
+    }
+
 }
