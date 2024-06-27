@@ -92,7 +92,7 @@ class UserController extends Controller
     }
 
 
-    public function reportUser(Request $request, $postId): \Illuminate\Http\JsonResponse
+    public function reportUser(Request $request): \Illuminate\Http\JsonResponse
     {
 
         $validator = Validator::make($request->all(), [

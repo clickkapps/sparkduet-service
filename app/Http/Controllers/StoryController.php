@@ -360,13 +360,13 @@ class StoryController extends Controller
         $user = $request->user();
         $reason = $request->get('reason');
 
-        $reported = StoryReport::with([])->create([
+        StoryReport::with([])->create([
             'user_id' => $user->id,
             'story_id' => $postId,
             'reason' => $reason,
         ]);
 
-        $reported->{'user'}->notify(new StoryReportCreated(storyId: $reported->{'id'}, reason: $reason));
+//        $reported->{'user'}->notify(new StoryReportCreated(storyId: $reported->{'id'}, reason: $reason));
 
         return response()->json(ApiResponse::successResponse());
 
