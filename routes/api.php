@@ -53,8 +53,8 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
 
     Route::get('/liked/post/{postId}', [\App\Http\Controllers\UserController::class, 'fetchLikedUsers']);
-    Route::get('/online/add/{userId}', [\App\Http\Controllers\UserController::class, 'addUserToOnline']);
-    Route::get('/online/remove/{userId}', [\App\Http\Controllers\UserController::class, 'removeUserFromOnline']);
+    Route::post('/online/add/{userId}', [\App\Http\Controllers\UserController::class, 'addUserToOnline']);
+    Route::post('/online/remove/{userId}', [\App\Http\Controllers\UserController::class, 'removeUserFromOnline']);
     Route::get('/online/get/{userId}', [\App\Http\Controllers\UserController::class, 'fetchUsersOnline']);
     Route::get('/online/count', [\App\Http\Controllers\UserController::class, 'countUsersOnline']);
 
