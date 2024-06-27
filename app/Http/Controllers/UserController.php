@@ -75,7 +75,8 @@ class UserController extends Controller
 
         $paginated = ProfileView::with(['viewer', 'profile'])->where([
             'profile_id' => $profileOwner->{'id'},
-        ])->orderByDesc('created_at')->simplePaginate($request->get('limit') ?: 10 );
+        ])->distinct('viewer_id')
+            ->orderByDesc('created_at')->simplePaginate($request->get('limit') ?: 10 );
 
         return response()->json(ApiResponse::successResponseWithData($paginated));
     }
@@ -86,7 +87,8 @@ class UserController extends Controller
         $unreadProfileViews = DB::table('profile_views')->where([
             'profile_id' => $profileOwner->{'id'},
             'profile_owner_read_at' => null
-        ])->count();
+        ])->distinct('viewer_id')
+            ->count();
 
         return response()->json(ApiResponse::successResponseWithData($unreadProfileViews));
 
