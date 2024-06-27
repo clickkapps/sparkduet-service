@@ -73,10 +73,19 @@ class UserController extends Controller
     {
         $profileOwner = $request->user();
 
-        $paginated = ProfileView::with(['viewer', 'profile'])->where([
-            'profile_id' => $profileOwner->{'id'},
-        ])->distinct('viewer_id')
-            ->orderByDesc('created_at')->simplePaginate($request->get('limit') ?: 10 );
+//        $paginated = ProfileView::with(['viewer', 'profile'])->where([
+//            'profile_id' => $profileOwner->{'id'},
+//        ])->orderByDesc('created_at')->simplePaginate($request->get('limit') ?: 10 );
+
+        $distinctViewers = ProfileView::where('profile_id', $profileOwner->{'id'})
+            ->groupBy('viewer_id')
+            ->pluck('viewer_id');
+
+        $paginated = ProfileView::with(['viewer', 'profile'])
+            ->whereIn('viewer_id', $distinctViewers)
+            ->where('profile_id', $profileOwner->{'id'})
+            ->orderByDesc('created_at')
+            ->simplePaginate($request->get('limit') ?: 10);
 
         return response()->json(ApiResponse::successResponseWithData($paginated));
     }
