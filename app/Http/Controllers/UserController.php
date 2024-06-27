@@ -309,7 +309,7 @@ class UserController extends Controller
     public function fetchUsersOnline(Request $request): JsonResponse
     {
         $limit = $request->get("limit") ?: 15;
-        $users = UserOnline::with(['user'])->simplePaginate($limit);
+        $users = UserOnline::with(['user'])->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
     public function countUsersOnline(Request $request): JsonResponse
