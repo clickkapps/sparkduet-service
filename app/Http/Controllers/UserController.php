@@ -322,7 +322,9 @@ class UserController extends Controller
             UserOnline::with([])->create(['user_id' => $userId]);
         }
         $user = User::with(['info'])->find($userId);
-        event(new UserOnlineStatusChanged(user: $user, status: "online"));
+
+        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
+        event(new UserOnlineStatusChanged(user: $user, status: "online", count:  $onlineCount));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -333,7 +335,10 @@ class UserController extends Controller
         ])->first();
         $online?->delete();
         $user = User::with(['info'])->find($userId);
-        event(new UserOnlineStatusChanged(user: $user, status: "offline"));
+
+
+        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
+        event(new UserOnlineStatusChanged(user: $user, status: "offline", count:  $onlineCount));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -346,13 +351,18 @@ class UserController extends Controller
             ->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
+
+    private function countPeopleOnline($userId): int
+    {
+        return UserOnline::with([])
+            ->where('user_id', '!=', $userId)
+            ->count();
+    }
     public function countUsersOnline(Request $request): JsonResponse
     {
 
         $user = $request->user();
-        $onlineCount = UserOnline::with([])
-            ->where('user_id', '!=', $user->{'id'})
-            ->count();
+        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
         return response()->json(ApiResponse::successResponseWithData($onlineCount));
     }
 
