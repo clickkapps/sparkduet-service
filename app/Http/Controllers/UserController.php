@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Events\UserOnlineStatusChanged;
 use App\Models\ProfileView;
+use App\Models\Story;
 use App\Models\StoryReport;
 use App\Models\User;
 use App\Models\UserBlock;
 use App\Models\UserNotice;
+use App\Models\UserOnline;
 use App\Traits\UserTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -269,6 +272,50 @@ class UserController extends Controller
             'disciplinary_action_taken_at' => now(),
             'disciplinary_action_taken_by' => $admin->{'id'}
         ]);
+    }
+
+
+    public function fetchLikedUsers(Request $request, $postId): \Illuminate\Http\JsonResponse {
+
+        $story = Story::with([])->find($postId);
+        $limit = $request->get("limit") ?: 15;
+        $users = $story->likedUsers()->with('info')->orderByDesc('created_at')->simplePaginate($limit);
+        return response()->json(ApiResponse::successResponseWithData($users));
+    }
+
+    // Users online visibility ----------------------------------------------
+    public function addUserToOnline(Request $request, $userId): JsonResponse
+    {
+        $exist = UserOnline::with([])->where([
+            'user_id' => $userId
+        ])->exists();
+        if(!$exist) {
+            UserOnline::with([])->create(['user_id' => $userId]);
+        }
+        event(new UserOnlineStatusChanged(userId: $userId, status: "online"));
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    public function removeUserFromOnline(Request $request, $userId): JsonResponse
+    {
+        $online = UserOnline::with([])->where([
+            'user_id' => $userId
+        ])->first();
+        $online?->delete();
+        event(new UserOnlineStatusChanged(userId: $userId, status: "offline"));
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    public function fetchUsersOnline(Request $request): JsonResponse
+    {
+        $limit = $request->get("limit") ?: 15;
+        $users = UserOnline::with(['user'])->simplePaginate($limit);
+        return response()->json(ApiResponse::successResponseWithData($users));
+    }
+    public function countUsersOnline(Request $request): JsonResponse
+    {
+        $onlineCount = UserOnline::with([])->count();
+        return response()->json(ApiResponse::successResponseWithData($onlineCount));
     }
 
 }

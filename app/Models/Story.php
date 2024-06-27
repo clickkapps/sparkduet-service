@@ -33,6 +33,10 @@ class Story extends Model
         return $this->hasMany(StoryLike::class);
     }
 
+    public function likedUsers(){
+        return $this->belongsToMany(User::class, 'story_likes', 'story_id', 'user_id');
+    }
+
     public function views(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StoryView::class);
