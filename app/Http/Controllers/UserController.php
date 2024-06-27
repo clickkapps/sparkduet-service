@@ -295,7 +295,8 @@ class UserController extends Controller
         if(!$exist) {
             UserOnline::with([])->create(['user_id' => $userId]);
         }
-        event(new UserOnlineStatusChanged(userId: $userId, status: "online"));
+        $user = User::with(['info'])->find($userId);
+        event(new UserOnlineStatusChanged(user: $user, status: "online"));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -305,7 +306,8 @@ class UserController extends Controller
             'user_id' => $userId
         ])->first();
         $online?->delete();
-        event(new UserOnlineStatusChanged(userId: $userId, status: "offline"));
+        $user = User::with(['info'])->find($userId);
+        event(new UserOnlineStatusChanged(user: $user, status: "offline"));
         return response()->json(ApiResponse::successResponse());
     }
 
