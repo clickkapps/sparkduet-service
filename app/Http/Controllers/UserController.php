@@ -277,9 +277,12 @@ class UserController extends Controller
 
     public function fetchLikedUsers(Request $request, $postId): \Illuminate\Http\JsonResponse {
 
+        $user = $request->user();
         $story = Story::with([])->find($postId);
         $limit = $request->get("limit") ?: 15;
-        $users = $story->likedUsers()->with('info')->orderByDesc('created_at')->simplePaginate($limit);
+        $users = $story->likedUsers()->with('info')
+            ->where('user_id', '!=', $user->{'id'}) // except this user
+            ->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
@@ -308,13 +311,20 @@ class UserController extends Controller
 
     public function fetchUsersOnline(Request $request): JsonResponse
     {
+        $user = $request->user();
         $limit = $request->get("limit") ?: 15;
-        $users = UserOnline::with(['user'])->orderByDesc('created_at')->simplePaginate($limit);
+        $users = UserOnline::with(['user'])
+            ->where('user_id', '!=', $user->{'id'}) // except this user
+            ->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
     public function countUsersOnline(Request $request): JsonResponse
     {
-        $onlineCount = UserOnline::with([])->count();
+
+        $user = $request->user();
+        $onlineCount = UserOnline::with([])
+            ->where('user_id', '!=', $user->{'id'})
+            ->count();
         return response()->json(ApiResponse::successResponseWithData($onlineCount));
     }
 
