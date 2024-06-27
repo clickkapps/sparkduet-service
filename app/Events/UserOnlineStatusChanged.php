@@ -19,7 +19,7 @@ class UserOnlineStatusChanged implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $user, string $status)
+    public function __construct(public $user, public string $status)
     {
         //
     }
