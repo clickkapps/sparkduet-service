@@ -51,6 +51,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::post('report-user', [\App\Http\Controllers\UserController::class, 'reportUser']);
     Route::post('block-user', [\App\Http\Controllers\UserController::class, 'userBlocksOffender']);
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
+    Route::post('block-status', [\App\Http\Controllers\UserController::class, 'getUserBlockUserStatus']);
 
     Route::get('/liked/post/{postId}', [\App\Http\Controllers\UserController::class, 'fetchLikedUsers']);
     Route::post('/online/add/{userId}', [\App\Http\Controllers\UserController::class, 'addUserToOnline']);

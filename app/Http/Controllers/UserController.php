@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Events\UserBlocksOffenderEvent;
 use App\Events\UserOnlineStatusChanged;
 use App\Models\ProfileView;
 use App\Models\Story;
@@ -215,6 +216,7 @@ class UserController extends Controller
             $userBlock->update(['reason' => $reason]);
         }
 
+        event(new UserBlocksOffenderEvent(offenderId: $offenderId));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -240,7 +242,27 @@ class UserController extends Controller
             $userBlock->delete();
         }
 
+        event(new UserBlocksOffenderEvent(offenderId: $offenderId));
         return response()->json(ApiResponse::successResponse());
+    }
+
+    public function getUserBlockUserStatus(Request $request): JsonResponse {
+        $user = $request->user();
+        $profileId = $request->get('profile_id');
+
+        $youBlockedUser = UserBlock::with([])->where('initiator_id', '=', $user->{'id'})
+            ->where('offender_id', '=', $profileId)
+            ->exists();
+
+        $userBlockedYou = UserBlock::with([])->where('offender_id', '=', $user->{'id'})
+            ->where('initiator_id', '=', $profileId)
+            ->exists();
+
+        return response()->json(ApiResponse::successResponseWithData([
+            'youBlockedUser' => $youBlockedUser,
+            'userBlockedYou' => $userBlockedYou
+        ]));
+
     }
 
     // For admins
