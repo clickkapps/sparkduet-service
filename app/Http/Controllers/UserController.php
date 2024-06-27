@@ -209,14 +209,17 @@ class UserController extends Controller
         $userBlock = UserBlock::with([])->where([
             'initiator_id' => $user->{'id'},
             'offender_id' => $offenderId,
-        ])->firstOrCreate();
+        ])->first();
 
-
-        if(!blank($reason)) {
-            $userBlock->update(['reason' => $reason]);
+        if(!$userBlock) {
+            UserBlock::with([])->create([
+                'initiator_id' => $user->{'id'},
+                'offender_id' => $offenderId,
+                'reason' => $reason
+            ]);
+            event(new UserBlocksOffenderEvent(offenderId: $offenderId));
         }
 
-        event(new UserBlocksOffenderEvent(offenderId: $offenderId));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -238,11 +241,12 @@ class UserController extends Controller
         ])->first();
 
 
-        if(!blank($userBlock)) {
+        if($userBlock) {
             $userBlock->delete();
+            event(new UserBlocksOffenderEvent(offenderId: $offenderId));
         }
 
-        event(new UserBlocksOffenderEvent(offenderId: $offenderId));
+
         return response()->json(ApiResponse::successResponse());
     }
 
