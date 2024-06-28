@@ -462,7 +462,7 @@ class AuthController extends Controller
     public function markAccountForDeletion(Request $request): JsonResponse {
         $user = $request->user();
         $user->update([
-           'marked_for_deletion' => now(),
+           'marked_for_deletion_at' => now(),
             'deleted_at' => now()
         ]);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
+use App\Events\StoryDisciplinaryActionTakenEvent;
 use App\Models\Story;
 use App\Models\StoryBookmark;
 use App\Models\StoryLike;
@@ -378,7 +379,7 @@ class StoryController extends Controller
      * @throws ValidationException
      * @throws \Exception
      */
-    public function takeDisciplinaryActionOnStory(Request $request) {
+    public function takeDisciplinaryActionOnStory(Request $request): \Illuminate\Http\JsonResponse {
 
         $this->validate($request, [
             'story_id' => 'required',
@@ -401,6 +402,19 @@ class StoryController extends Controller
             'disciplinary_action_taken_at' => now(),
             'disciplinary_action_taken_by' => $admin->{'id'}
         ]);
+
+        event(new StoryDisciplinaryActionTakenEvent(storyId: $storyId, disAction: $disciplinaryAction));
+
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    public function deleteStory($id): \Illuminate\Http\JsonResponse {
+
+        $story = Story::with([])->find($id);
+        $story->update(['deleted_at' => now()]);
+
+        return response()->json(ApiResponse::successResponse());
+
     }
 
 

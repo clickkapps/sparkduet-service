@@ -22,7 +22,8 @@ class Story extends Model
         'aspect_ratio',
         'disciplinary_action',
         'disciplinary_action_taken_at',
-        'disciplinary_action_taken_by'
+        'disciplinary_action_taken_by',
+        'deleted_at'
     ];
 
     // Ensure full_name is included in array and JSON representations

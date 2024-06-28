@@ -111,6 +111,7 @@ Route::prefix('posts')->middleware('auth:sanctum')->group(function () {
     Route::post('/create-post', [\App\Http\Controllers\StoryController::class, 'createPost']);
     Route::post('/attach-post-media/{id}', [\App\Http\Controllers\StoryController::class, 'attachMediaToPost']);
     Route::post('/update/{id}', [\App\Http\Controllers\StoryController::class, 'updateFeed']);
+    Route::post('/delete/{id}', [\App\Http\Controllers\StoryController::class, 'deleteStory']);
 
     // User posts
     Route::get('/user/{userId}', [\App\Http\Controllers\StoryController::class, 'fetchUserPosts']);
