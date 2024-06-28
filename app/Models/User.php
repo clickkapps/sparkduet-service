@@ -29,6 +29,9 @@ class User extends Authenticatable
         'email_verified_at',
         'public_key',
         'chat_id',
+        'deleted_at',
+        'marked_for_deletion_at',
+        'banned_at'
     ];
 
     /**

@@ -28,6 +28,9 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
     Route::get('should-prompt-basic-info-update', [\App\Http\Controllers\AuthController::class, 'shouldPromptAuthUserToUpdateBasicInfo']);
     Route::get('basic-info-prompted', [\App\Http\Controllers\AuthController::class, 'setPromptBasicInfoCompleted']);
     Route::post('setup-location', [\App\Http\Controllers\AuthController::class, 'setupUserLocation']);
+
+    Route::post('mark-account-for-deletion', [\App\Http\Controllers\AuthController::class, 'markAccountForDeletion']);
+    Route::get('active-check', [\App\Http\Controllers\AuthController::class, 'checkIfAccountIsActive']);
 });
 
 //Route::prefix('chat')->middleware('basicAuth')->group(function () {

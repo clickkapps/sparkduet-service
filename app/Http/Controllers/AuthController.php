@@ -459,4 +459,37 @@ class AuthController extends Controller
 
     }
 
+    public function markAccountForDeletion(Request $request): JsonResponse {
+        $user = $request->user();
+        $user->update([
+           'marked_for_deletion' => now(),
+            'deleted_at' => now()
+        ]);
+
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    public function checkIfAccountIsActive(Request $request): JsonResponse {
+
+        $user = $request->user();
+        if($user->{'deleted_at'}) {
+            return response()->json(ApiResponse::successResponse([
+                'active' => false,
+                'reason' => "Your account has been deleted. Contact our support team for any enquiries"
+            ]));
+        }
+
+        if($user->{'banned_at'}) {
+            return response()->json(ApiResponse::successResponse([
+                'active' => false,
+                'reason' => "This account has been banned.  Contact our support team for any enquiries"
+            ]));
+        }
+
+        return response()->json(ApiResponse::successResponse([
+            'active' => true,
+            'reason' => ""
+        ]));
+    }
+
 }

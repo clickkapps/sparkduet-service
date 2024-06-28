@@ -308,6 +308,10 @@ class UserController extends Controller
             throw new \Exception("Invalid offender id");
         }
 
+        if($disciplinaryAction == "banned") {
+            $offender->update(['banned_at' => now()]);
+        }
+
         $activeRecord = UserDisciplinaryRecord::with([])->create([
             'user_id' => $userId,
             'disciplinary_action' => $disciplinaryAction,
@@ -343,6 +347,15 @@ class UserController extends Controller
     {
         $activeRecord = UserDisciplinaryRecord::with([])->find($id);
         $activeRecord?->update(['status' => 'closed']);
+
+
+        if($activeRecord->{'disciplinary_action'} == "banned") {
+            $userId = $activeRecord->{'user_id'};
+            $offender = User::with([])->find($userId);
+            $offender?->update(['banned_at' => null]);
+        }
+
+
         event(new UserDisciplinaryRecordEvent(userId: $activeRecord->{'user_id'}, disRecordId: $activeRecord->{'id'}, disciplinaryRecord: null));
         return response()->json(ApiResponse::successResponseWithData($activeRecord));
     }
