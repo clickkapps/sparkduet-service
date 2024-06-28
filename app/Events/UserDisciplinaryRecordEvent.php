@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\UserDisciplinaryRecord;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserDisciplinaryRecordAddedEvent
+class UserDisciplinaryRecordEvent implements  ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,7 +20,7 @@ class UserDisciplinaryRecordAddedEvent
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private int $userId, public int $disRecordId, public ?UserDisciplinaryRecord $disciplinaryRecord = null)
     {
         //
     }
@@ -31,6 +32,6 @@ class UserDisciplinaryRecordAddedEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new Channel('users.'.$this->userId.'.disciplinary-record-updated');
     }
 }

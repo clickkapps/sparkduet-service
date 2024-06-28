@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
 use App\Events\UserBlocksOffenderEvent;
+use App\Events\UserDisciplinaryRecordEvent;
 use App\Events\UserOnlineStatusChanged;
 use App\Models\ProfileView;
 use App\Models\Story;
@@ -307,7 +308,7 @@ class UserController extends Controller
             throw new \Exception("Invalid offender id");
         }
 
-        UserDisciplinaryRecord::with([])->create([
+        $activeRecord = UserDisciplinaryRecord::with([])->create([
             'user_id' => $userId,
             'disciplinary_action' => $disciplinaryAction,
             'disciplinary_action_taken_by' => $admin->{'id'},
@@ -316,6 +317,7 @@ class UserController extends Controller
             'status'  => 'opened' // opened / closed if its opened we show it to the user
         ]);
 
+        event(new UserDisciplinaryRecordEvent(userId: $activeRecord->{'user_id'}, disRecordId: $activeRecord->{'id'}, disciplinaryRecord: $activeRecord));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -341,6 +343,7 @@ class UserController extends Controller
     {
         $activeRecord = UserDisciplinaryRecord::with([])->find($id);
         $activeRecord?->update(['status' => 'closed']);
+        event(new UserDisciplinaryRecordEvent(userId: $activeRecord->{'user_id'}, disRecordId: $activeRecord->{'id'}, disciplinaryRecord: null));
         return response()->json(ApiResponse::successResponseWithData($activeRecord));
     }
 
