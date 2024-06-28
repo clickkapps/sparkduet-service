@@ -52,12 +52,14 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::post('block-user', [\App\Http\Controllers\UserController::class, 'userBlocksOffender']);
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
     Route::post('block-status', [\App\Http\Controllers\UserController::class, 'getUserBlockUserStatus']);
+    Route::get('get-disciplinary-record/{userId}', [\App\Http\Controllers\UserController::class, 'fetchUserLatestDisciplinaryAction']);
+    Route::post('mark-disciplinary-as-read', [\App\Http\Controllers\UserController::class, 'markDisciplinaryActionAsRead']);
 
     Route::get('/liked/post/{postId}', [\App\Http\Controllers\UserController::class, 'fetchLikedUsers']);
     Route::post('/online/add/{userId}', [\App\Http\Controllers\UserController::class, 'addUserToOnline']);
     Route::post('/online/remove/{userId}', [\App\Http\Controllers\UserController::class, 'removeUserFromOnline']);
     Route::get('/online/get', [\App\Http\Controllers\UserController::class, 'fetchUsersOnline']);
-    Route::get('/online/count', [\App\Http\Controllers\UserController::class, 'countUsersOnline']);
+    Route::get('/online/ids', [\App\Http\Controllers\UserController::class, 'getUserIdsOnline']);
 
 });
 

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserOnlineStatusChanged implements ShouldBroadcast
+class UserDisciplinaryRecordAddedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,7 +19,7 @@ class UserOnlineStatusChanged implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public string $status, public $ids)
+    public function __construct()
     {
         //
     }
@@ -31,6 +31,6 @@ class UserOnlineStatusChanged implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('user.online.status-changed');
+        return new PrivateChannel('channel-name');
     }
 }

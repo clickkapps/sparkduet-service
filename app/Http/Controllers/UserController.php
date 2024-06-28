@@ -10,6 +10,7 @@ use App\Models\Story;
 use App\Models\StoryReport;
 use App\Models\User;
 use App\Models\UserBlock;
+use App\Models\UserDisciplinaryRecord;
 use App\Models\UserNotice;
 use App\Models\UserOnline;
 use App\Traits\UserTrait;
@@ -285,16 +286,19 @@ class UserController extends Controller
      * @throws ValidationException
      * @throws \Exception
      */
-    public function takeDisciplinaryActionOnUser(Request $request) {
+    public function takeDisciplinaryActionOnUser(Request $request): JsonResponse
+    {
 
         $this->validate($request, [
             'user_id' => 'required',
-            'disciplinary_action' => 'required'
+            'disciplinary_action' => 'required',
+            'reason' => 'required'
         ]);
 
         $admin = $request->user();
         $userId = $request->get('user_id');
         $disciplinaryAction = $request->get('disciplinary_action');
+        $reason = $request->get('reason');
 
         $offender = User::with([])->where(['id' => $userId])
             ->first();
@@ -303,11 +307,41 @@ class UserController extends Controller
             throw new \Exception("Invalid offender id");
         }
 
-        $offender->update([
+        UserDisciplinaryRecord::with([])->create([
+            'user_id' => $userId,
             'disciplinary_action' => $disciplinaryAction,
-            'disciplinary_action_taken_at' => now(),
-            'disciplinary_action_taken_by' => $admin->{'id'}
+            'disciplinary_action_taken_by' => $admin->{'id'},
+            'reason' => $reason,
+            'user_read_at' => null,
+            'status'  => 'opened' // opened / closed if its opened we show it to the user
         ]);
+
+        return response()->json(ApiResponse::successResponse());
+    }
+
+    public function fetchUserLatestDisciplinaryAction($userId): JsonResponse
+    {
+        $activeRecord = UserDisciplinaryRecord::with([])
+            ->where('user_id', $userId)
+            ->where('status', 'opened')
+            ->orderByDesc('created_at')
+            ->first();
+
+        return response()->json(ApiResponse::successResponseWithData($activeRecord));
+    }
+
+    public function markDisciplinaryActionAsRead($id): JsonResponse
+    {
+        $activeRecord = UserDisciplinaryRecord::with([])->find($id);
+        $activeRecord?->update(['user_read_at' => now()]);
+        return response()->json(ApiResponse::successResponseWithData($activeRecord));
+    }
+
+    public function closeDisciplinaryAction($id): JsonResponse
+    {
+        $activeRecord = UserDisciplinaryRecord::with([])->find($id);
+        $activeRecord?->update(['status' => 'closed']);
+        return response()->json(ApiResponse::successResponseWithData($activeRecord));
     }
 
 
@@ -333,8 +367,8 @@ class UserController extends Controller
         }
         $user = User::with(['info'])->find($userId);
 
-        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
-        event(new UserOnlineStatusChanged(user: $user, status: "online", count:  $onlineCount));
+        $onlineIds = $this->getUserOnlineIds();
+        event(new UserOnlineStatusChanged(status: "offline", ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -347,8 +381,8 @@ class UserController extends Controller
         $user = User::with(['info'])->find($userId);
 
 
-        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
-        event(new UserOnlineStatusChanged(user: $user, status: "offline", count:  $onlineCount));
+        $onlineIds = $this->getUserOnlineIds();
+        event(new UserOnlineStatusChanged(status: "offline", ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -362,18 +396,15 @@ class UserController extends Controller
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
-    private function countPeopleOnline($userId): int
+    private function getUserOnlineIds(): \Illuminate\Support\Collection
     {
-        return UserOnline::with([])
-            ->where('user_id', '!=', $userId)
-            ->count();
+        return UserOnline::with([])->pluck('id');
     }
-    public function countUsersOnline(Request $request): JsonResponse
-    {
 
-        $user = $request->user();
-        $onlineCount = $this->countPeopleOnline(userId: $user->{'id'});
-        return response()->json(ApiResponse::successResponseWithData($onlineCount));
+    public function getUserIdsOnline(Request $request): JsonResponse
+    {
+        $usersOnline = $this->getUserOnlineIds();
+        return response()->json(ApiResponse::successResponseWithData($usersOnline));
     }
 
 }

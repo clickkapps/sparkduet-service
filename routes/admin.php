@@ -20,6 +20,7 @@ Route::prefix('user')->middleware(['auth:sanctum', 'role:Admin'])->group(functio
     Route::post('create-notice', [\App\Http\Controllers\UserController::class, 'createUserNotice']);
     Route::post('delete-notice', [\App\Http\Controllers\UserController::class, 'deleteUserNotice']);
     Route::post('take-disciplinary-action', [\App\Http\Controllers\UserController::class, 'takeDisciplinaryActionOnUser']);
+    Route::post('close-disciplinary-record/{id}', [\App\Http\Controllers\UserController::class, 'closeDisciplinaryAction']);
 });
 
 

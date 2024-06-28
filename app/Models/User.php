@@ -29,9 +29,6 @@ class User extends Authenticatable
         'email_verified_at',
         'public_key',
         'chat_id',
-        'disciplinary_action',
-        'disciplinary_action_taken_at',
-        'disciplinary_action_taken_by'
     ];
 
     /**
