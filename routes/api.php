@@ -53,7 +53,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::post('unblock-user', [\App\Http\Controllers\UserController::class, 'userUnblocksOffender']);
     Route::post('block-status', [\App\Http\Controllers\UserController::class, 'getUserBlockUserStatus']);
     Route::get('get-disciplinary-record/{userId}', [\App\Http\Controllers\UserController::class, 'fetchUserLatestDisciplinaryAction']);
-    Route::post('mark-disciplinary-as-read', [\App\Http\Controllers\UserController::class, 'markDisciplinaryActionAsRead']);
+    Route::post('mark-disciplinary-as-read/{id}', [\App\Http\Controllers\UserController::class, 'markDisciplinaryActionAsRead']);
 
     Route::get('/liked/post/{postId}', [\App\Http\Controllers\UserController::class, 'fetchLikedUsers']);
     Route::post('/online/add/{userId}', [\App\Http\Controllers\UserController::class, 'addUserToOnline']);
