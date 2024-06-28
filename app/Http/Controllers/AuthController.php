@@ -473,20 +473,20 @@ class AuthController extends Controller
 
         $user = $request->user();
         if($user->{'deleted_at'}) {
-            return response()->json(ApiResponse::successResponse([
+            return response()->json(ApiResponse::successResponseWithData([
                 'active' => false,
                 'reason' => "Your account has been deleted. Contact our support team for any enquiries"
             ]));
         }
 
         if($user->{'banned_at'}) {
-            return response()->json(ApiResponse::successResponse([
+            return response()->json(ApiResponse::successResponseWithData([
                 'active' => false,
                 'reason' => "This account has been banned.  Contact our support team for any enquiries"
             ]));
         }
 
-        return response()->json(ApiResponse::successResponse([
+        return response()->json(ApiResponse::successResponseWithData([
             'active' => true,
             'reason' => ""
         ]));
