@@ -398,7 +398,7 @@ class UserController extends Controller
 
     private function getUserOnlineIds(): \Illuminate\Support\Collection
     {
-        return UserOnline::with([])->pluck('id');
+        return UserOnline::with([])->pluck('user_id');
     }
 
     public function getUserIdsOnline(Request $request): JsonResponse
