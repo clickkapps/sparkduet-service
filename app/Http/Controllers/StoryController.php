@@ -161,7 +161,6 @@ class StoryController extends Controller
     }
 
 
-
     public function fetchUserBookmarkedPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
 
         // Fetch the user with relationships
@@ -170,7 +169,6 @@ class StoryController extends Controller
         // Get the paginated bookmarked stories
         $posts = $user->bookmarkedStories()
             ->where([
-                "user_id" => $userId,
                 "deleted_at" => null,
                 "disciplinary_action" => null
             ])
