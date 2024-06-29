@@ -61,6 +61,10 @@ class StoryController extends Controller
         $user = $request->user();
         $query = Story::with(['user.info'])
             ->where("user_id", "!=", $user->id)
+            ->where([
+                "deleted_at" => null,
+                "disciplinary_action" => null
+            ])
             ->where('media_path', '!=', "");
 
         $stories = $query->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
@@ -140,8 +144,12 @@ class StoryController extends Controller
     public function fetchUserPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
 
 
-        $query = Story::with(['user'])
-            ->where(["user_id" => $userId])
+        $query = Story::with(['user.info'])
+            ->where([
+                "user_id" => $userId,
+                "deleted_at" => null,
+                "disciplinary_action" => null
+            ])
             ->withCount(['likes', 'views'])
             ->orderByDesc("created_at");
 
@@ -160,7 +168,13 @@ class StoryController extends Controller
         $user = User::with(['bookmarkedStories.user.info'])->findOrFail($userId);
 
         // Get the paginated bookmarked stories
-        $posts = $user->bookmarkedStories()->simplePaginate($request->get("limit") ?: 9); // Adjust the per-page limit as needed
+        $posts = $user->bookmarkedStories()
+            ->where([
+                "user_id" => $userId,
+                "deleted_at" => null,
+                "disciplinary_action" => null
+            ])
+            ->simplePaginate($request->get("limit") ?: 9); // Adjust the per-page limit as needed
 
         $posts = $this->setAdditionalFeedParameters($request, $posts);
 
