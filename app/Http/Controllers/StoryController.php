@@ -410,7 +410,7 @@ class StoryController extends Controller
         }
 
         $story->update([
-            'disciplinary_action' => $disciplinaryAction,
+            'disciplinary_action' => $disciplinaryAction == "removed" ? null : $disciplinaryAction,
             'disciplinary_action_taken_at' => now(),
             'disciplinary_action_taken_by' => $admin->{'id'}
         ]);
