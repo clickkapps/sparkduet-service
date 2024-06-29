@@ -23,7 +23,9 @@ class Story extends Model
         'disciplinary_action',
         'disciplinary_action_taken_at',
         'disciplinary_action_taken_by',
-        'deleted_at'
+        'deleted_at',
+        'reviewed_at',
+        'reviewed_by'
     ];
 
     // Ensure full_name is included in array and JSON representations

@@ -12,7 +12,7 @@ class PaymentController extends Controller
     public function revenueCatWebhookCallback(Request $request): \Illuminate\Http\JsonResponse
     {
         $event = $request->all()['event'];
-//        json_encode("Revcat callback payload => " . json_encode($event));
+        json_encode("Revcat callback payload => " . json_encode($event));
         $productId = $event['product_id'] ?? "";
         $appUserId = $event['app_user_id'] ?? "";
         $type = $event['type'] ?? "";
@@ -30,6 +30,7 @@ class PaymentController extends Controller
             }else{
                 DB::table('daily_subscriptions_records')->insert([
                     'sub_counter' => 1,
+                    'unsub_counter' => 0,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
@@ -44,6 +45,7 @@ class PaymentController extends Controller
                 ]);
             }else{
                 DB::table('daily_subscriptions_records')->insert([
+                    'sub_counter' => 0,
                     'unsub_counter' => 1,
                     'created_at' => now(),
                     'updated_at' => now()

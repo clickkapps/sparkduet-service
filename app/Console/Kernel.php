@@ -2,7 +2,9 @@
 
 namespace App\Console;
 
+use App\Console\Commands\EndOfDayAdminAnalysisCommand;
 use App\Console\Commands\EvaluateProfileViews;
+use App\Console\Commands\HourlyAdminAnalysisCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +25,8 @@ class Kernel extends ConsoleKernel
         })->everyTwoHours();
         $schedule->command('disposable:update')->weekly();
         $schedule->command(EvaluateProfileViews::class)->fridays()->at('12:30');
+        $schedule->command(HourlyAdminAnalysisCommand::class)->hourly();
+        $schedule->command(EndOfDayAdminAnalysisCommand::class)->daily()->at('23:00');
 
     }
 
