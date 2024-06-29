@@ -19,7 +19,7 @@ class StoryDisciplinaryActionTakenEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public int $storyId,  ?string $disAction)
+    public function __construct(public int $storyId, public ?string $disAction)
     {}
 
     /**
