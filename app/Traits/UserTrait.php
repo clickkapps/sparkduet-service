@@ -65,8 +65,10 @@ trait UserTrait
         $user = User::with(['info'])->find($userId);
         $introductoryStory = Story::with([])->where([
             "user_id" =>  $userId,
-            "purpose" => "introduction"
-        ])->first();
+            "purpose" => "introduction",
+            "deleted_at" => null,
+            "disciplinary_action" => null
+        ])->orderByDesc('created_at')->first();
 
         $user->{"introductory_post"} = $introductoryStory;
 
