@@ -67,6 +67,9 @@ class StoryController extends Controller
             ])
             ->where('media_path', '!=', "");
 
+        // apply user's personalization
+        // limit by the country
+
         $stories = $query->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
             return $story;
         });

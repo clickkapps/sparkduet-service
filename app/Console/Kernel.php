@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         })->everyTwoHours();
         $schedule->command('disposable:update')->weekly();
         $schedule->command(EvaluateProfileViews::class)->fridays()->at('12:30');
-        $schedule->command(HourlyAdminAnalysisCommand::class)->hourly();
+        $schedule->command(HourlyAdminAnalysisCommand::class)->daily()->at('22:00');
         $schedule->command(EndOfDayAdminAnalysisCommand::class)->daily()->at('23:00');
 
     }
