@@ -153,6 +153,7 @@ class StoryController extends Controller
                 "deleted_at" => null,
                 "disciplinary_action" => null
             ])
+            ->whereNotNull('media_path')
             ->withCount(['likes', 'views'])
             ->orderByDesc("created_at");
 
