@@ -171,6 +171,7 @@ class StoryController extends Controller
 
         // Get the paginated bookmarked stories
         $posts = $user->bookmarkedStories()
+            ->with('user.info')
             ->where([
                 "deleted_at" => null,
                 "disciplinary_action" => null
