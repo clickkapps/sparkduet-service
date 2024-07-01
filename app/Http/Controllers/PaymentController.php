@@ -19,12 +19,13 @@ class PaymentController extends Controller
         $environment = $event['environment'] ?? "";
 
         /// later move this block of code to live
-        $created = DB::table('daily_subscriptions_records')->whereDate('created_at', '=', today())->first();
+        $query = DB::table('daily_subscriptions_records')->whereDate('created_at', '=', today())->first();
+        $created = (clone $query)->first();
         if($type == "INITIAL_PURCHASE" || $type == "RENEWAL" || $type == "UNCANCELLATION" || $type == "SUBSCRIPTION_EXTENDED") {
             // subscriptions
             if($created) {
                 $counter = $created->{'sub_counter'} + 1;
-                $created->update([
+                $query->update([
                     'sub_counter' => $counter
                 ]);
             }else{
@@ -40,7 +41,7 @@ class PaymentController extends Controller
             // unsubscriptions
             if($created) {
                 $counter = $created->{'unsub_counter'} + 1;
-                $created->update([
+                $query->update([
                     'unsub_counter' => $counter
                 ]);
             }else{
