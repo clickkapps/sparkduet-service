@@ -69,7 +69,7 @@ class ChatController extends Controller
         // Check if there's a common chat connection ID
         $commonConnectionIds = $firstParticipantConnections->intersect($secondParticipantConnections);
 
-        Log::info("customLog: $commonConnectionIds");
+        Log::info("customLog: commonConnectionIds" . json_encode($commonConnectionIds));
 
         // Retrieve the connection that is not marked as deleted
         $activeConnection = ChatConnection::with([])->whereIn('id', $commonConnectionIds)
@@ -77,14 +77,17 @@ class ChatController extends Controller
             ->first();
 
 
-        Log::info("customLog: activeConnection: $activeConnection");
+        Log::info("customLog: activeConnection: " . json_encode($activeConnection));
 
         $chatConnection = null;
         if ($activeConnection) {
+            Log::info('customLog: entered activeconnection ------');
             // Participants share at least one chat connection ID
             $chatConnection = ChatConnection::with(['participants'])->find($activeConnection->{'id'});
 
         } else if($createConnectionIfNotExist)  {
+
+            Log::info('customLog: entered create new connection ------');
 
             // No common chat connection ID found
             $chatConnection = ChatConnection::with(['participants'])->create([
@@ -103,6 +106,8 @@ class ChatController extends Controller
 
             event(new ChatConnectionCreatedEvent(chatConnection: $chatConnection));
 
+        }else {
+            Log::info('customLog: returning null connection ------');
         }
 
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
