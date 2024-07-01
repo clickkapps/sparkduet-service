@@ -333,8 +333,11 @@ class ChatController extends Controller
 
         // mark it as deleted for both parties
          ChatParticipant::with([])->where([
-            'chat_connection_id' => $chatConnectionId
-        ])->update(['unread_messages' => 0,]);
+            'chat_connection_id' => $chatConnectionId,
+        ])->update([
+                'unread_messages' => 0,
+                'deleted_at' => now()
+             ]);
 
         event(new ChatConnectionDeletedEvent(userId: $opponentId, chatConnectionId: $chatConnectionId));
         event(new CountUnreadMessagesEvent(chatConnectionId: $chatConnectionId, userId: $opponentId));
