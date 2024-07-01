@@ -127,7 +127,7 @@ class ChatController extends Controller
             ->with(['participants' => function($query) {
                 $query->withPivot('unread_messages');
             }, 'lastMessage'])
-            ->orderByDesc('created_at')->simplePaginate($limit);
+            ->orderByDesc('updated_at')->simplePaginate($limit);
 
         return response()->json(ApiResponse::successResponseWithData($chatConnections));
     }
