@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class StoryLikesEvaluatedJob implements ShouldQueue
 {
@@ -32,7 +33,15 @@ class StoryLikesEvaluatedJob implements ShouldQueue
     {
         $user = User::with([])->find(($this->userId));
         $message = $this->likes . '+ new likes on your posts today';
-        $user->notify(new StoryLikesEvaluated(message: $message));
+
+        if($user) {
+            $settings = DB::table('user_settings')->where('user_id', $user->{'id'})->first();
+            $storyLikesNotificationsEnabled = $settings->{'enable_story_likes_notifications'};
+            if($storyLikesNotificationsEnabled) {
+                $user->notify(new StoryLikesEvaluated(message: $message));
+            }
+
+        }
 
     }
 }

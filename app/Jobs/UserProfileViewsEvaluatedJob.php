@@ -52,7 +52,12 @@ class UserProfileViewsEvaluatedJob implements ShouldQueue
             ])->count();
             event(new UserProfileViewsCounted(userId: $this->userId, count: $unreadProfileViews));
 
-            $user->notify(new \App\Notifications\UserProfileViewsEvaluated(message: $message));
+            $settings = DB::table('user_settings')->where('user_id', $user->{'id'})->first();
+            $profileViewsNotificationsEnabled = $settings->{'enable_profile_views_notifications'};
+            if($profileViewsNotificationsEnabled) {
+                $user->notify(new \App\Notifications\UserProfileViewsEvaluated(message: $message));
+            }
+
         }
 
     }

@@ -6,8 +6,10 @@ use App\Events\ChatMessageCreatedEvent;
 use App\Models\ChatParticipant;
 use App\Models\User;
 use App\Notifications\ChatMessageCreated;
+use App\Notifications\StoryLikesEvaluated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SendPushToChatOpponentListener implements ShouldQueue
@@ -41,7 +43,12 @@ class SendPushToChatOpponentListener implements ShouldQueue
             'chat_connection_id' => $chatConnectionId
         ])->first()->{'unread_messages'};
 
-        $opponent->notify(new ChatMessageCreated(sender: $sender, chatConnectionId: $chatConnectionId, unreadMessagesCount: $unreadMessagesCount));
+        $settings = DB::table('user_settings')->where('user_id', $opponent->{'id'})->first();
+        $chatNotificationsEnabled = $settings->{'enable_chat_notifications'};
+        if($chatNotificationsEnabled) {
+            $opponent->notify(new ChatMessageCreated(sender: $sender, chatConnectionId: $chatConnectionId, unreadMessagesCount: $unreadMessagesCount));
+        }
+
 
     }
 }
