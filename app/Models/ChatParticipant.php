@@ -14,7 +14,8 @@ class ChatParticipant extends Model
     protected $fillable = [
         'chat_connection_id',
         'user_id',
-        'unread_messages'
+        'unread_messages',
+        'deleted_at'
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
