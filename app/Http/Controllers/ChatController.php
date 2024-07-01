@@ -60,9 +60,12 @@ class ChatController extends Controller
 
         $firstParticipantConnections = ChatParticipant::with([])->where([
             'user_id' => $firstParticipantId,
-        ])->pluck('chat_connection_id');
+        ])
+            ->whereNull('deleted_at')
+            ->pluck('chat_connection_id');
 
         $secondParticipantConnections = ChatParticipant::with([])
+            ->whereNull('deleted_at')
             ->where('user_id', $secondParticipantId)
             ->pluck('chat_connection_id');
 
@@ -138,7 +141,7 @@ class ChatController extends Controller
             },
             'lastMessage'
         ])
-            ->whereNull('deleted_at')
+            ->whereNull('chat_connections.deleted_at')
             ->find($id);
 
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
