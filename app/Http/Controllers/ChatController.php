@@ -123,7 +123,7 @@ class ChatController extends Controller
         $limit = $request->get("limit") ?: 15;
         // Get chat connections along with participants
         $chatConnections = $user->chatConnections()
-            ->whereNull('deleted_at')
+            ->whereNull('chat_connections.deleted_at')
             ->with(['participants' => function($query) {
                 $query->withPivot('unread_messages');
             }, 'lastMessage'])
