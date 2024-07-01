@@ -59,7 +59,7 @@ class ChatController extends Controller
         $createConnectionIfNotExist = $request->get('create_connection_if_not_exist');
 
         $firstParticipantConnections = ChatParticipant::with([])->where([
-            'user_id' => $secondParticipantId,
+            'user_id' => $firstParticipantId,
         ])->pluck('chat_connection_id');
 
         $secondParticipantConnections = ChatParticipant::with([])
