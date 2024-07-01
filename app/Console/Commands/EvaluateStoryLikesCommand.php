@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\StoryLikesEvaluatedJob;
 use App\Models\StoryLike;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -42,8 +43,9 @@ class EvaluateStoryLikesCommand extends Command
 
         // To see the results
         foreach ($results as $result) {
-            $log = "User ID: " . $result->user_id . " - Likes Today: " . $result->likes_count . "\n";
-            Log::info($log);
+//            $log = "User ID: " . $result->user_id . " - Likes Today: " . $result->likes_count . "\n";
+            StoryLikesEvaluatedJob::dispatch($result->user_id, $result->likes_count);
+//            Log::info($log);
         }
 
 

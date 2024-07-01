@@ -45,7 +45,7 @@ class EvaluateProfileViewsCommand extends Command
             $user = User::with([])->find($view->profile_id);
             if($user) {
                 $message = $view->unread_count . '+ new people viewed your profile';
-                \App\Jobs\UserProfileViewsEvaluated::dispatch($user->{'id'}, $message);
+                \App\Jobs\UserProfileViewsEvaluatedJob::dispatch($user->{'id'}, $message);
                 $user->notify(new \App\Notifications\UserProfileViewsEvaluated(message: $message));
             }
         }
