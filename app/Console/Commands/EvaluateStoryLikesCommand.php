@@ -6,6 +6,7 @@ use App\Models\StoryLike;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EvaluateStoryLikesCommand extends Command
 {
@@ -41,7 +42,8 @@ class EvaluateStoryLikesCommand extends Command
 
         // To see the results
         foreach ($results as $result) {
-            echo "User ID: " . $result->user_id . " - Likes Today: " . $result->likes_count . "\n";
+            $log = "User ID: " . $result->user_id . " - Likes Today: " . $result->likes_count . "\n";
+            Log::info($log);
         }
 
 
