@@ -377,28 +377,33 @@ class UserController extends Controller
     {
         $exist = UserOnline::with([])->where([
             'user_id' => $userId
-        ])->exists();
+        ])->first();
         if(!$exist) {
-            UserOnline::with([])->create(['user_id' => $userId]);
+            UserOnline::with([])->create(['user_id' => $userId, 'status' => 'online']);
+        }else {
+            $exist->update(['status' => 'online']);
         }
         $user = User::with(['info'])->find($userId);
 
         $onlineIds = $this->getUserOnlineIds();
-        event(new UserOnlineStatusChanged(status: "offline", ids:  $onlineIds));
+        event(new UserOnlineStatusChanged(ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
 
     public function removeUserFromOnline(Request $request, $userId): JsonResponse
     {
+
         $online = UserOnline::with([])->where([
             'user_id' => $userId
         ])->first();
-        $online?->delete();
-        $user = User::with(['info'])->find($userId);
-
+        if($online) {
+            $online->update(['status' => 'offline']);
+        }else {
+            UserOnline::with([])->create(['user_id' => $userId, 'status' => 'offline']);
+        }
 
         $onlineIds = $this->getUserOnlineIds();
-        event(new UserOnlineStatusChanged(status: "offline", ids:  $onlineIds));
+        event(new UserOnlineStatusChanged(ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
 
@@ -412,13 +417,11 @@ class UserController extends Controller
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
-    private function getUserOnlineIds(): \Illuminate\Support\Collection
-    {
-        return UserOnline::with([])->pluck('user_id');
+    private function getUserOnlineIds(): \Illuminate\Support\Collection {
+        return UserOnline::with([])->where('status', '=', 'online')->pluck('user_id');
     }
 
-    public function getUserIdsOnline(Request $request): JsonResponse
-    {
+    public function getUserIdsOnline(Request $request): JsonResponse {
         $usersOnline = $this->getUserOnlineIds();
         return response()->json(ApiResponse::successResponseWithData($usersOnline));
     }

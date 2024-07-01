@@ -12,7 +12,8 @@ class UserOnline extends Model
     protected $table = 'user_onlines';
 
     protected $fillable = [
-      'user_id'
+      'user_id',
+      'status'
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
