@@ -19,7 +19,7 @@ class PaymentController extends Controller
         $environment = $event['environment'] ?? "";
 
         /// later move this block of code to live
-        $query = DB::table('daily_subscriptions_records')->whereDate('created_at', '=', today())->first();
+        $query = DB::table('daily_subscriptions_records')->whereDate('created_at', '=', today());
         $created = (clone $query)->first();
         if($type == "INITIAL_PURCHASE" || $type == "RENEWAL" || $type == "UNCANCELLATION" || $type == "SUBSCRIPTION_EXTENDED") {
             // subscriptions
