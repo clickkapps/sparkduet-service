@@ -3,7 +3,8 @@
 namespace App\Console;
 
 use App\Console\Commands\EndOfDayAdminAnalysisCommand;
-use App\Console\Commands\EvaluateProfileViews;
+use App\Console\Commands\EvaluateProfileViewsCommand;
+use App\Console\Commands\EvaluateStoryLikesCommand;
 use App\Console\Commands\HourlyAdminAnalysisCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -24,7 +25,8 @@ class Kernel extends ConsoleKernel
             Log::info('cron is running');
         })->everyTwoHours();
         $schedule->command('disposable:update')->weekly();
-        $schedule->command(EvaluateProfileViews::class)->fridays()->at('12:30');
+        $schedule->command(EvaluateProfileViewsCommand::class)->fridays()->at('12:30');
+        $schedule->command(EvaluateStoryLikesCommand::class)->daily()->at('18:15');
         $schedule->command(HourlyAdminAnalysisCommand::class)->daily()->at('22:00');
         $schedule->command(EndOfDayAdminAnalysisCommand::class)->daily()->at('23:00');
 
