@@ -153,7 +153,7 @@ class StoryController extends Controller
                 "deleted_at" => null,
                 "disciplinary_action" => null
             ])
-            ->whereNotNull('media_path')
+            ->where('media_path', '!=', "")
             ->withCount(['likes', 'views'])
             ->orderByDesc("created_at");
 
@@ -177,6 +177,7 @@ class StoryController extends Controller
                 "deleted_at" => null,
                 "disciplinary_action" => null
             ])
+            ->where('media_path', '!=', "")
             ->simplePaginate($request->get("limit") ?: 9); // Adjust the per-page limit as needed
 
         $posts = $this->setAdditionalFeedParameters($request, $posts);
