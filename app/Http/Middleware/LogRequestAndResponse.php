@@ -19,6 +19,7 @@ class LogRequestAndResponse
      */
     public function handle(Request $request, Closure $next)
     {
+        Log::info('incoming url: ' . json_encode($request->fullUrl()));
         Log::info('incoming request IP: ' . json_encode($request->ip()));
         Log::info('incoming request header: ' . json_encode($request->header()));
         Log::info('incoming request body: ' . json_encode($request->all()));
