@@ -19,9 +19,9 @@ class RestrictIP
      */
     public function handle(Request $request, Closure $next)
     {
+        Log::info('incoming request IP: ' . json_encode($request->ip()));
         Log::info('incoming request header: ' . json_encode($request->header()));
         Log::info('incoming request body: ' . json_encode($request->all()));
-        Log::info('incoming request IP: ' . json_encode($request->ip()));
 
         $countryCode = ip_info("Visitor", "Country Code"); // IN
         if ( $countryCode == 'IND') {
@@ -32,6 +32,14 @@ class RestrictIP
 
         Log::info('IP accepted: ' . json_encode($request->ip()) . ' country code: ' . json_encode($countryCode));
 
-        return $next($request);
+        $response = $next($request);
+        // Log the response
+        Log::info('Outgoing Response', [
+            'status' => $response->getStatusCode(),
+            'headers' => $response->headers->all(),
+            'body' => $response->getContent(),
+        ]);
+
+        return $response;
     }
 }
