@@ -399,7 +399,7 @@ class AuthController extends Controller
             ->first();
 
         // check if we have already requested user to
-        if($userInfo->{"requested_profile_update"}) {
+        if($userInfo->{"requested_basic_info_update"}) {
             return response()->json(ApiResponse::successResponseWithData(false));
         }
 
@@ -424,7 +424,7 @@ class AuthController extends Controller
 
         $user = $request->user();
         UserInfo::with([])->where(["user_id" => $user->id])
-            ->update(['requested_profile_update' => now()]);
+            ->update(['requested_basic_info_update' => now()]);
 
         return response()->json(ApiResponse::successResponse());
     }

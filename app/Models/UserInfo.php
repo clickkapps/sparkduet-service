@@ -24,10 +24,10 @@ class UserInfo extends Model
         'timezone',
         'profile_pic_path',
         'introductory_video_path',
-        'requested_profile_update',
+        'requested_basic_info_update',
+        'requested_preference_info_update',
         "age_at",
         'race',
-
         'preferred_gender',
         'preferred_min_age',
         'preferred_max_age',
