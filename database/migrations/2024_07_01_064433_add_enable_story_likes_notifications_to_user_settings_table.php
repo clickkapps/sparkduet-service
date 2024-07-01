@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('user_settings', function (Blueprint $table) {
-            $table->string('enable_story_likes_notifications')->nullable()->default(null);
+            $table->boolean('enable_story_likes_notifications')->nullable()->default(true);
         });
     }
 
