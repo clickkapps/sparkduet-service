@@ -69,10 +69,15 @@ class ChatController extends Controller
         // Check if there's a common chat connection ID
         $commonConnectionIds = $firstParticipantConnections->intersect($secondParticipantConnections);
 
+        Log::info("customLog: $commonConnectionIds");
+
         // Retrieve the connection that is not marked as deleted
         $activeConnection = ChatConnection::with([])->whereIn('id', $commonConnectionIds)
             ->whereNull('deleted_at')
             ->first();
+
+
+        Log::info("customLog: activeConnection: $activeConnection");
 
         $chatConnection = null;
         if ($activeConnection) {
@@ -96,9 +101,10 @@ class ChatController extends Controller
             ]);
             $chatConnection = $chatConnection->refresh();
 
+            event(new ChatConnectionCreatedEvent(chatConnection: $chatConnection));
+
         }
 
-        event(new ChatConnectionCreatedEvent(chatConnection: $chatConnection));
         return response()->json(ApiResponse::successResponseWithData($chatConnection));
 
     }
