@@ -44,6 +44,10 @@ class PreferencesController extends Controller
             $settingsPayload["enable_story_views_notifications"] = $request->get("enable_story_views_notifications");
         }
 
+        if($request->has("enable_story_likes_notifications")) {
+            $settingsPayload["enable_story_likes_notifications"] = $request->get("enable_story_likes_notifications");
+        }
+
         if($request->has("theme_appearance")) {
             $settingsPayload["theme_appearance"] = $request->get("theme_appearance");
         }
