@@ -85,5 +85,9 @@ class User extends Authenticatable
         return $this->hasMany(UserNotification::class, 'user_id', 'id');
     }
 
+    public function stories(){
+        return $this->hasMany(Story::class);
+    }
+
 
 }

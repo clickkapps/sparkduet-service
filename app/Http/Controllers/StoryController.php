@@ -59,18 +59,115 @@ class StoryController extends Controller
     public function fetchStoryFeeds(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        $query = Story::with(['user.info'])
-            ->where("user_id", "!=", $user->id)
-            ->where([
-                "deleted_at" => null,
-                "disciplinary_action" => null
-            ])
-            ->where('media_path', '!=', "");
+//        $query = Story::with(['user.info'])
+//            ->where("user_id", "!=", $user->id)
+//            ->where([
+//                "deleted_at" => null,
+//                "disciplinary_action" => null
+//            ])
+//            ->where('media_path', '!=', "");
+
+
+        /// Preferences
+        // Get preferred gender
+        $preferredGenderOutput = [];
+        if(!blank($user->info->{'preferred_gender'})) {
+            $preferredGender = json_decode($user->info->{'preferred_gender'});
+            //eg.  [ any ] , ["women","men","transgenders","non_binary_or_non_conforming"]
+            foreach ($preferredGender as $gender) {
+                if($gender == "women") {
+                    $preferredGenderOutput[] = "female";
+                }
+                if($gender == "men") {
+                    $preferredGenderOutput[] = "male";
+                }
+                if($gender == "transgenders") {
+                    $preferredGenderOutput[] = "transgender";
+                }
+                if($gender == "non_binary_or_non_conforming") {
+                    $preferredGenderOutput[] = "non_binary_or_non_conforming";
+                }
+//            if($gender == "any") {
+//                $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
+//            }else {
+//
+//            }
+            }
+        }
+
+        // Get preferred minimum age and max age
+        $preferredMinAge = $user->info->{"preferred_min_age"} ?? 18; // eg. 18
+        $preferredMaxAge = $user->info->{"preferred_max_age"} ?? 70; // eg. 70
+
+        // Get preferred races
+        $preferredRacesOutput = [];
+        if(!blank($user->info->{'preferred_races'})) {
+            $preferredRaces = json_decode($user->info->{'preferred_races'});
+            foreach ($preferredRaces as $race) {
+//            if($race == "other") {
+//                $preferredRacesOutput = [];
+//            }
+                if($race != "other") {
+                    $preferredGenderOutput[] = $race;
+                }
+            }
+        }
+        // eg. ["white","hispanic_latino_or_spanish_origin","middle_eastern_or_north_african","native_hawaiian_or_other_pacific_islander","black_or_african_american","asian"]
+
+        // Get preferred nationalities
+        $includedNationalities = [];
+        $excludedNationalities = [];
+        if(!blank($user->info->{'preferred_nationalities'})) {
+            $preferredNationalities = json_decode($user->info->{'preferred_nationalities'}, true);
+            //eg. {"key":"only","values":["GH"]}
+            $key = $preferredNationalities['key'];
+            $values = $preferredNationalities['values'];
+            if($key == 'only') {
+                foreach ($values as $value) {
+                    $includedNationalities[] = $value;
+                }
+            }
+            if($key == 'except') {
+                foreach ($values as $value) {
+                    $excludedNationalities[] = $value;
+                }
+            }
+
+        }
+
 
         // apply user's personalization
         // limit by the country
 
-        $stories = $query->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
+        // Check if user has viewed story before ----------------
+
+        // Fetch stories with users' age between minAge and maxAge
+        $query = Story::with(['user.info'])
+            ->where("user_id", "!=", $user->id)
+            ->where([ "deleted_at" => null, "disciplinary_action" => null])
+            ->where('media_path', '!=', "")
+            ->join('users', 'stories.user_id', '=', 'users.id')
+            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
+
+        if(!empty($preferredGenderOutput)){
+            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+        }
+
+        if(!empty($preferredRacesOutput)) {
+            $query->whereIn('user_infos.race', $preferredRacesOutput);
+        }
+
+        // Apply nationality filters based on the presence of included or excluded nationalities
+        if (!empty($includedNationalities)) {
+            $query->whereIn('user_infos.country', $includedNationalities);
+        } elseif (!empty($excludedNationalities)) {
+            $query->whereNotIn('user_infos.country', $excludedNationalities);
+        }
+
+        // Select only the stories columns
+
+        $stories = $query->select('stories.*')->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
             return $story;
         });
 
