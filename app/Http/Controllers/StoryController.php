@@ -175,6 +175,19 @@ class StoryController extends Controller
                 return $story;
             });
 
+        // If the filtered query results are empty, fallback to retrieving all stories
+        if ($stories->isEmpty()) {
+            $stories = Story::with(['user.info'])
+                ->where('stories.user_id', '!=', $user->id)
+                ->where([
+                    'stories.deleted_at' => null,
+                    'stories.disciplinary_action' => null,
+                ])
+                ->where('stories.media_path', '!=', '')
+                ->simplePaginate($request->get('limit') ?: 3);
+        }
+
+
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
         $merged = $updatedItems->getCollection();
