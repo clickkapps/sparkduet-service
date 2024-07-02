@@ -143,33 +143,37 @@ class StoryController extends Controller
 
         // Fetch stories with users' age between minAge and maxAge
         $query = Story::with(['user.info'])
-            ->where("user_id", "!=", $user->id)
-            ->where([ "deleted_at" => null, "disciplinary_action" => null])
-            ->where('media_path', '!=', "")
+            ->where('stories.user_id', '!=', $user->id)
+            ->where([
+                'stories.deleted_at' => null,
+                'stories.disciplinary_action' => null,
+            ])
+            ->where('stories.media_path', '!=', '')
             ->join('users', 'stories.user_id', '=', 'users.id')
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
 
-        if(!empty($preferredGenderOutput)){
+        if (!empty($preferredGenderOutput)) {
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
 
-        if(!empty($preferredRacesOutput)) {
+        if (!empty($preferredRacesOutput)) {
             $query->whereIn('user_infos.race', $preferredRacesOutput);
         }
 
-        // Apply nationality filters based on the presence of included or excluded nationalities
+// Apply nationality filters based on the presence of included or excluded nationalities
         if (!empty($includedNationalities)) {
             $query->whereIn('user_infos.country', $includedNationalities);
         } elseif (!empty($excludedNationalities)) {
             $query->whereNotIn('user_infos.country', $excludedNationalities);
         }
 
-        // Select only the stories columns
-
-        $stories = $query->select('stories.*')->simplePaginate($request->get("limit") ?: 3)->through(function ($story, $key) use ($user){
-            return $story;
-        });
+// Select only the stories columns
+        $stories = $query->select('stories.*')
+            ->simplePaginate($request->get('limit') ?: 3)
+            ->through(function ($story, $key) use ($user) {
+                return $story;
+            });
 
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
