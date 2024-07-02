@@ -413,6 +413,7 @@ class UserController extends Controller
         $limit = $request->get("limit") ?: 15;
         $users = UserOnline::with(['user'])
             ->where('user_id', '!=', $user->{'id'}) // except this user
+            ->where('status', '=', 'online')
             ->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
