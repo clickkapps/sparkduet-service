@@ -184,7 +184,7 @@ class StoryController extends Controller
 //                    $join->on('stories.id', '=', 'story_views.story_id')
 //                        ->where('story_views.user_id', '=', $userId);
 //                })
-                ->where('story_views.user_id', '=', null)
+//                ->where('story_views.user_id', '=', null)
                 ->where('stories.user_id', '!=', $user->id)
                 ->whereNull('stories.deleted_at')
                 ->whereNull('stories.disciplinary_action')
