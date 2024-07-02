@@ -180,10 +180,10 @@ class StoryController extends Controller
         // If the filtered query results are empty, fallback to retrieving all stories except those already viewed by the user
         if ($stories->isEmpty()) {
             $stories = Story::with(['user.info'])
-                ->leftJoin('story_views', function ($join) use ($userId) {
-                    $join->on('stories.id', '=', 'story_views.story_id')
-                        ->where('story_views.user_id', '=', $userId);
-                })
+//                ->leftJoin('story_views', function ($join) use ($userId) {
+//                    $join->on('stories.id', '=', 'story_views.story_id')
+//                        ->where('story_views.user_id', '=', $userId);
+//                })
                 ->where('story_views.user_id', '=', null)
                 ->where('stories.user_id', '!=', $user->id)
                 ->whereNull('stories.deleted_at')
