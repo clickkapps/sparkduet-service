@@ -59,6 +59,7 @@ class StoryController extends Controller
     public function fetchStoryFeeds(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
+        $userId = $user->{'id'};
 //        $query = Story::with(['user.info'])
 //            ->where("user_id", "!=", $user->id)
 //            ->where([
@@ -142,12 +143,17 @@ class StoryController extends Controller
         // Check if user has viewed story before ----------------
 
         // Fetch stories with users' age between minAge and maxAge
+        // Build the filtered query with joins and initial filters
+
         $query = Story::with(['user.info'])
+            ->leftJoin('story_views', function ($join) use ($userId) {
+                $join->on('stories.id', '=', 'story_views.story_id')
+                    ->where('story_views.user_id', '=', $userId);
+            })
+            ->where('story_views.user_id', '=', null)
             ->where('stories.user_id', '!=', $user->id)
-            ->where([
-                'stories.deleted_at' => null,
-                'stories.disciplinary_action' => null,
-            ])
+            ->whereNull('stories.deleted_at')
+            ->whereNull('stories.disciplinary_action')
             ->where('stories.media_path', '!=', '')
             ->join('users', 'stories.user_id', '=', 'users.id')
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
@@ -157,32 +163,31 @@ class StoryController extends Controller
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
 
-        if (!empty($preferredRacesOutput)) {
-            $query->whereIn('user_infos.race', $preferredRacesOutput);
+        if (!empty($preferredRace)) {
+            $query->whereIn('user_infos.race', $preferredRace);
         }
 
-// Apply nationality filters based on the presence of included or excluded nationalities
+        // Apply nationality filters based on the presence of included or excluded nationalities
         if (!empty($includedNationalities)) {
             $query->whereIn('user_infos.country', $includedNationalities);
         } elseif (!empty($excludedNationalities)) {
             $query->whereNotIn('user_infos.country', $excludedNationalities);
         }
 
-// Select only the stories columns
-        $stories = $query->select('stories.*')
-            ->simplePaginate($request->get('limit') ?: 3)
-            ->through(function ($story, $key) use ($user) {
-                return $story;
-            });
+        // Select only the stories columns and paginate
+        $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
 
-        // If the filtered query results are empty, fallback to retrieving all stories
+        // If the filtered query results are empty, fallback to retrieving all stories except those already viewed by the user
         if ($stories->isEmpty()) {
             $stories = Story::with(['user.info'])
+                ->leftJoin('story_views', function ($join) use ($userId) {
+                    $join->on('stories.id', '=', 'story_views.story_id')
+                        ->where('story_views.user_id', '=', $userId);
+                })
+                ->where('story_views.user_id', '=', null)
                 ->where('stories.user_id', '!=', $user->id)
-                ->where([
-                    'stories.deleted_at' => null,
-                    'stories.disciplinary_action' => null,
-                ])
+                ->whereNull('stories.deleted_at')
+                ->whereNull('stories.disciplinary_action')
                 ->where('stories.media_path', '!=', '')
                 ->simplePaginate($request->get('limit') ?: 3);
         }
