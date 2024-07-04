@@ -81,14 +81,14 @@ class ChatController extends Controller
 
         // Fetch the users whose stories have been viewed by the authenticated user, ordered by the most views
         $viewedStoryUsers = User::whereHas('stories', function ($query) use ($userId) {
-            $query->whereHas('storyViews', function ($query) use ($userId) {
+            $query->whereHas('views', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             });
         })
             ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
             ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
             ->with(['stories' => function ($query) use ($userId) {
-                $query->whereHas('storyViews', function ($query) use ($userId) {
+                $query->whereHas('views', function ($query) use ($userId) {
                     $query->where('user_id', $userId);
                 })->orderByRaw('COALESCE(story_views.watched_count, 1) DESC')->orderBy('story_views.created_at', 'desc');
             }])
@@ -101,7 +101,7 @@ class ChatController extends Controller
         $relatedUsers = $relatedUsers->sortByDesc(function ($user) use ($userId) {
             $latestLike = $user->stories->pluck('likes')->flatten()->where('user_id', $userId)->sortByDesc('created_at')->first();
             $latestProfileView = $user->profileViews->where('viewer_id', $userId)->sortByDesc('created_at')->first();
-            $latestStoryView = $user->stories->pluck('storyViews')->flatten()->where('user_id', $userId)->sortByDesc('created_at')->first();
+            $latestStoryView = $user->stories->pluck('views')->flatten()->where('user_id', $userId)->sortByDesc('created_at')->first();
 
             return max(
                 optional($latestLike)->created_at,
