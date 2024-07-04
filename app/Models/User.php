@@ -104,5 +104,9 @@ class User extends Authenticatable
         return $this->hasMany(ProfileView::class, 'viewer_id');
     }
 
+    public function storyViews() {
+        return $this->hasMany(StoryView::class, 'user_id');
+    }
+
 
 }
