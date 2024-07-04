@@ -75,7 +75,6 @@ class Story extends Model
         return $this->likes()->whereNotNull('count')->sum('count');
     }
 
-
     // Define an accessor to get the count of bookmarks
     public function getStoryLikesByUser($userId)
     {

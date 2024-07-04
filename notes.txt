@@ -13,3 +13,6 @@
 
 // at regular interval, we check if the user you're following has created new posts and send you notifications
 
+Let's expand the query one more time. the purpose of all we did was to suggest users to the authenticated user, so that they can start a conversation. If the authenticated user has already started a conversation with any person in the list of users, let's exclude that user.
+
+I have a `chat_participants` table.

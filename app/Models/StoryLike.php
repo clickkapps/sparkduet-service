@@ -15,4 +15,9 @@ class StoryLike extends Model
         'story_id',
         'count'
     ];
+
+    public function story()
+    {
+        return $this->belongsTo(Story::class);
+    }
 }

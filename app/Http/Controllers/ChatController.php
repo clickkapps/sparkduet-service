@@ -16,6 +16,7 @@ use App\Models\ChatConnection;
 use App\Models\ChatMessage;
 use App\Models\ChatParticipant;
 use App\Models\User;
+use App\Models\UserBlock;
 use App\Notifications\ChatMessageCreated;
 use App\Traits\UserTrait;
 use Carbon\Carbon;
@@ -30,16 +31,89 @@ class ChatController extends Controller
     public function fetchSuggestedChats(Request $request): \Illuminate\Http\JsonResponse
     {
         $authUser = $request->user();
-        $suggestedUsers = User::with(['info'])->where('id', '!=', $authUser->{'id'})->get();
 
-        $users = $suggestedUsers->map(function ($user) use ($authUser) {
-            $user = $this->attachUserComputedAge($user);
-            // Hide fields you don't want to include in the JSON response
-            $user->makeHidden(['first_login_at', 'public_key', 'last_login_at']);
-            return $user;
-        });
+        $userId = $request->user()->id;
 
-        return response()->json(ApiResponse::successResponseWithData($users));
+        // Fetch the IDs of users blocked by the authenticated user
+        $blockedUserIds = UserBlock::where('initiator_id', $userId)->pluck('offender_id');
+
+        // Fetch the IDs of users who have blocked the authenticated user
+        $blockedByUserIds = UserBlock::where('offender_id', $userId)->pluck('initiator_id');
+
+        // Combine both lists of blocked user IDs
+        $allBlockedUserIds = $blockedUserIds->merge($blockedByUserIds)->unique();
+
+        // Fetch the IDs of users with whom the authenticated user has already started a conversation
+        $conversationUserIds = ChatParticipant::where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->pluck('chat_connection_id');
+
+        $conversationUserIds = ChatParticipant::whereIn('chat_connection_id', $conversationUserIds)
+            ->where('user_id', '!=', $userId)
+            ->whereNull('deleted_at')
+            ->pluck('user_id');
+
+        // Fetch the users (creators) of the stories that the authenticated user has liked, ordered by the most recent like
+        $likedStoryCreators = User::whereHas('stories', function ($query) use ($userId) {
+            $query->whereHas('likes', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
+        })
+            ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
+            ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
+            ->with(['stories' => function ($query) use ($userId) {
+                $query->whereHas('likes', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })->orderBy('likes.created_at', 'desc');
+            }])
+            ->get();
+
+        // Fetch the users whose profiles have been viewed by the authenticated user, ordered by the most recent view
+        $viewedProfiles = User::whereHas('profileViews', function ($query) use ($userId) {
+            $query->where('viewer_id', $userId);
+        })
+            ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
+            ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
+            ->with(['profileViews' => function ($query) use ($userId) {
+                $query->where('viewer_id', $userId)->orderBy('created_at', 'desc');
+            }])
+            ->get();
+
+        // Fetch the users whose stories have been viewed by the authenticated user, ordered by the most views
+        $viewedStoryUsers = User::whereHas('stories', function ($query) use ($userId) {
+            $query->whereHas('storyViews', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
+        })
+            ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
+            ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
+            ->with(['stories' => function ($query) use ($userId) {
+                $query->whereHas('storyViews', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })->orderByRaw('COALESCE(story_views.watched_count, 1) DESC')->orderBy('story_views.created_at', 'desc');
+            }])
+            ->get();
+
+        // Merge the three collections and remove duplicates
+        $relatedUsers = $likedStoryCreators->merge($viewedProfiles)->merge($viewedStoryUsers)->unique('id');
+
+        // Sort the merged collection by the most recent interaction (like, profile view, or story view)
+        $relatedUsers = $relatedUsers->sortByDesc(function ($user) use ($userId) {
+            $latestLike = $user->stories->pluck('likes')->flatten()->where('user_id', $userId)->sortByDesc('created_at')->first();
+            $latestProfileView = $user->profileViews->where('viewer_id', $userId)->sortByDesc('created_at')->first();
+            $latestStoryView = $user->stories->pluck('storyViews')->flatten()->where('user_id', $userId)->sortByDesc('created_at')->first();
+
+            return max(
+                optional($latestLike)->created_at,
+                optional($latestProfileView)->created_at,
+                optional($latestStoryView)->created_at
+            );
+        })->values();
+
+        // Take the first 10 users
+        $relatedUsers = $relatedUsers->take(10);
+
+        return response()->json(ApiResponse::successResponseWithData($relatedUsers));
     }
 
     /**

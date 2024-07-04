@@ -15,4 +15,14 @@ class UserBlock extends Model
         'offender_id',
         'reason'
     ];
+
+    public function initiator()
+    {
+        return $this->belongsTo(User::class, 'initiator_id');
+    }
+
+    public function offender()
+    {
+        return $this->belongsTo(User::class, 'offender_id');
+    }
 }

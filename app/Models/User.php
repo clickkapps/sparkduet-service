@@ -89,5 +89,20 @@ class User extends Authenticatable
         return $this->hasMany(Story::class);
     }
 
+    public function likes()
+    {
+        return $this->hasMany(StoryLike::class);
+    }
+
+    public function profileViews()
+    {
+        return $this->hasMany(ProfileView::class, 'profile_id');
+    }
+
+    public function viewedProfiles()
+    {
+        return $this->hasMany(ProfileView::class, 'viewer_id');
+    }
+
 
 }
