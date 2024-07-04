@@ -64,7 +64,7 @@ class ChatController extends Controller
             ->with(['stories' => function ($query) use ($userId) {
                 $query->whereHas('likes', function ($query) use ($userId) {
                     $query->where('user_id', $userId);
-                })->orderBy('story_likes.created_at', 'desc');
+                })->orderBy('created_at', 'desc');
             }])
             ->get();
 
