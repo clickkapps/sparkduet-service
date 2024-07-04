@@ -90,7 +90,7 @@ class ChatController extends Controller
             ->with(['stories' => function ($query) use ($userId) {
                 $query->whereHas('views', function ($query) use ($userId) {
                     $query->where('user_id', $userId);
-                })->orderByRaw('COALESCE(story_views.watched_count, 1) DESC')->orderBy('story_views.created_at', 'desc');
+                })->orderByRaw('COALESCE(watched_count, 1) DESC')->orderBy('created_at', 'desc');
             }])
             ->get();
 
