@@ -250,10 +250,8 @@ class StoryController extends Controller
         ]);
 
         $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
-        if(blank($introductoryPost)) {
-            if($pageKey == 1) {
+        if(blank($introductoryPost) && $pageKey == 1) {
                 $uniqueStory = collect([ 'id' => -1 ]);
-            }
         }else {
             $expectationPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "expectations"])->first();
             if(blank($expectationPost)) {
@@ -297,7 +295,12 @@ class StoryController extends Controller
 //
 //        }
 
-        $storiesCollection->prepend($uniqueStory);
+        // Conditionally insert the unique story into the first or second position
+        if ($storiesCollection->count() > 1) {
+            $storiesCollection->splice(1, 0, [$uniqueStory]);
+        } else {
+            $storiesCollection->prepend($uniqueStory);
+        }
 
         // Create a new paginator with the modified stories collection
         $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
