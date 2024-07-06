@@ -245,15 +245,18 @@ class StoryController extends Controller
         Log::info("page=".$pageKey);
 
         // Create the unique collection and prepend it to the stories collection
-        $uniqueStory = collect([
-            ['id' => -5], /// Introductory video
-        ]);
+        $uniqueStory = collect(['id' => -5]); // Encourage users to creat post about anything on their mind
 
-        $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
+        $introductoryPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "introduction"])->first();
+
+        $introductoryPostAdded = false;
         if(blank($introductoryPost) && $pageKey == 1) {
                 $uniqueStory = collect([ 'id' => -1 ]);
-        }else {
-            $expectationPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "expectations"])->first();
+                $introductoryPostAdded = true;
+        }
+
+        if(!$introductoryPostAdded) {
+            $expectationPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "expectations"])->first();
             if(blank($expectationPost)) {
                 if($pageKey == 2) {
                     $uniqueStory = collect([
@@ -262,13 +265,13 @@ class StoryController extends Controller
                 }
             }else {
                 if($pageKey == 3) {
-                    $previousRelationshipPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "previousRelationship"])->first();
+                    $previousRelationshipPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "previousRelationship"])->first();
                     if(blank($previousRelationshipPost)) {
                         $uniqueStory = collect([
                             [ 'id' => -3 ], /// Purpose video
                         ]);
                     }else {
-                        $careerPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
+                        $careerPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "career"])->first();
                         if(blank($careerPost)) {
                             $uniqueStory = collect([
                                 ['id' => -4], /// Career video
@@ -278,7 +281,6 @@ class StoryController extends Controller
                 }
             }
         }
-
 //        if($updatedItems->isEmpty()) {
 //
 //            /// This prompts the user to create post
