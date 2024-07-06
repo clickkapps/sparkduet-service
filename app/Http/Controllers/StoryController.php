@@ -239,7 +239,7 @@ class StoryController extends Controller
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
         // Convert the stories pagination object to a collection
-        $storiesCollection = collect($updatedItems->items());
+//        $storiesCollection = collect($updatedItems->items());
 
         $pageKey = $request->get('page');
         Log::info("page=".$pageKey);
