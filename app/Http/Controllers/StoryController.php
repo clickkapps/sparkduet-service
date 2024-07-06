@@ -241,7 +241,7 @@ class StoryController extends Controller
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
         // Convert the stories pagination object to a collection
-//        $storiesCollection = collect($updatedItems->items());
+        $storiesCollection = collect($updatedItems->items());
 
         $pageKey = $request->get('page');
         Log::info("page=".$pageKey);
@@ -296,24 +296,24 @@ class StoryController extends Controller
 //        }
 
         // Conditionally insert the unique story into the first or second position
-//        if ($storiesCollection->count() > 1) {
-//            $storiesCollection->splice(1, 0, [$uniqueStory]);
-//        } else {
-//            $storiesCollection->prepend($uniqueStory);
-//        }
+        if ($storiesCollection->count() > 1) {
+            $storiesCollection->splice(1, 0, [$uniqueStory]);
+        } else {
+            $storiesCollection->prepend($uniqueStory);
+        }
 
         // Create a new paginator with the modified stories collection
-//        $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
-//            $storiesCollection,
-//            $storiesCollection->count(),
-//            $stories->perPage(),
-//            $stories->currentPage(),
-//            ['path' => $stories->path()]
-//        );
+        $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
+            $storiesCollection,
+            $storiesCollection->count(),
+            $stories->perPage(),
+            $stories->currentPage(),
+            ['path' => $stories->path()]
+        );
 
 
-//        return response()->json(ApiResponse::successResponseWithData($modifiedStories));
-        return response()->json(ApiResponse::successResponseWithData($updatedItems));
+        return response()->json(ApiResponse::successResponseWithData($modifiedStories));
+//        return response()->json(ApiResponse::successResponseWithData($updatedItems));
     }
 
     public function fetchUserPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
