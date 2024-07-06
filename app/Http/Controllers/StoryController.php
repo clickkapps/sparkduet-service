@@ -124,6 +124,7 @@ class StoryController extends Controller
         $includedNationalities = [];
         $excludedNationalities = [];
         if(!blank($user->info->{'preferred_nationalities'})) {
+            Log::info('preferred_nationalities: ' . $user->info->{'preferred_nationalities'});
             $preferredNationalities = json_decode($user->info->{'preferred_nationalities'}, true);
             //eg. {"key":"only","values":["GH"]}
             $key = $preferredNationalities['key'];
@@ -205,12 +206,14 @@ class StoryController extends Controller
             }
         }
 
+        Log::info('$includedNationalities: ' . json_encode($includedNationalities));
+        Log::info('$excludedNationalities: ' . json_encode($excludedNationalities));
 //        // Apply nationality filters based on the presence of included or excluded nationalities
-//        if (!empty($includedNationalities)) {
-//            $query->whereIn('user_infos.country', $includedNationalities);
-//        } elseif (!empty($excludedNationalities)) {
-//            $query->whereNotIn('user_infos.country', $excludedNationalities);
-//        }
+        if (!empty($includedNationalities)) {
+            $query->whereIn('user_infos.country', $includedNationalities);
+        } elseif (!empty($excludedNationalities)) {
+            $query->whereNotIn('user_infos.country', $excludedNationalities);
+        }
 
         // Select only the stories columns and paginate
         $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
