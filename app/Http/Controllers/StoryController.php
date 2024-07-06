@@ -305,7 +305,7 @@ class StoryController extends Controller
         // Create a new paginator with the modified stories collection
         $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
             $storiesCollection,
-            $updatedItems->total(),
+            $storiesCollection->count(),
             $stories->perPage(),
             $stories->currentPage(),
             ['path' => $stories->path()]
