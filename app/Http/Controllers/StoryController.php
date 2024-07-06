@@ -79,7 +79,7 @@ class StoryController extends Controller
             foreach ($preferredGender as $gender) {
 
                 if($gender == "any") {
-                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
+                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming", ""];
                 }else {
                     if($gender == "women") {
                         $preferredGenderOutput[] = "female";
