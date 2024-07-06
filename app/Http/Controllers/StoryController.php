@@ -180,7 +180,7 @@ class StoryController extends Controller
             ->whereNull('stories.disciplinary_action')
             ->where('stories.media_path', '!=', '')
             ->whereNull('users.banned_at') // Exclude banned users
-//            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge])
+            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge])
         ;
 
 //        if (!empty($preferredGenderOutput)) {
