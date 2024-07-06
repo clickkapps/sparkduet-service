@@ -158,10 +158,10 @@ class StoryController extends Controller
         // Build the filtered query with joins and initial filters
         // Build the filtered query with joins and initial filters
         $query = Story::with(['user.info'])
-//            ->leftJoin('story_views', function ($join) use ($userId) {
-//                $join->on('stories.id', '=', 'story_views.story_id')
-//                    ->where('story_views.user_id', '=', $userId);
-//            })
+            ->leftJoin('story_views', function ($join) use ($userId) {
+                $join->on('stories.id', '=', 'story_views.story_id')
+                    ->where('story_views.user_id', '=', $userId);
+            })
             ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
                 $join->on('stories.user_id', '=', 'b1.offender_id')
                     ->where('b1.initiator_id', '=', $userId);
@@ -173,14 +173,15 @@ class StoryController extends Controller
             ->join('users', 'stories.user_id', '=', 'users.id')
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
 //            ->whereNull('story_views.user_id')
-            ->whereNull('b1.id')
-            ->whereNull('b2.id')
-            ->where('stories.user_id', '!=', $userId)
-            ->whereNull('stories.deleted_at') // Exclude deleted stories
-            ->whereNull('stories.disciplinary_action')
-            ->where('stories.media_path', '!=', '')
-            ->whereNull('users.banned_at') // Exclude banned users
-            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
+//            ->whereNull('b1.id')
+//            ->whereNull('b2.id')
+//            ->where('stories.user_id', '!=', $userId)
+//            ->whereNull('stories.deleted_at') // Exclude deleted stories
+//            ->whereNull('stories.disciplinary_action')
+//            ->where('stories.media_path', '!=', '')
+//            ->whereNull('users.banned_at') // Exclude banned users
+//            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
+        ;
 
         if (!empty($preferredGenderOutput)) {
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
