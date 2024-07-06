@@ -111,7 +111,7 @@ class StoryController extends Controller
 //                $preferredRacesOutput = [];
 //            }
                 if($race != "other") {
-                    $preferredGenderOutput[] = $race;
+                    $preferredRacesOutput[] = $race;
                 }
             }
         }
