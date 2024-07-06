@@ -294,11 +294,11 @@ class StoryController extends Controller
 //        }
 
         // Conditionally insert the unique story into the first or second position
-        if ($storiesCollection->count() > 1) {
-            $storiesCollection->splice(1, 0, [$uniqueStory]);
-        } else {
-            $storiesCollection->prepend($uniqueStory);
-        }
+//        if ($storiesCollection->count() > 1) {
+//            $storiesCollection->splice(1, 0, [$uniqueStory]);
+//        } else {
+//            $storiesCollection->prepend($uniqueStory);
+//        }
 
         // Create a new paginator with the modified stories collection
         $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
