@@ -189,10 +189,10 @@ class StoryController extends Controller
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
 //
-//        if (!empty($preferredRace)) {
-//            $query->whereIn('user_infos.race', $preferredRace);
-//        }
-//
+        if (!empty($preferredRacesOutput)) {
+            $query->whereIn('user_infos.race', $preferredRacesOutput);
+        }
+
 //        // Apply nationality filters based on the presence of included or excluded nationalities
 //        if (!empty($includedNationalities)) {
 //            $query->whereIn('user_infos.country', $includedNationalities);
