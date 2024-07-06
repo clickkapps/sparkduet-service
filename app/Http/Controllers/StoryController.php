@@ -258,25 +258,21 @@ class StoryController extends Controller
         if(!$introductoryPostAdded) {
             $expectationPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "expectations"])->first();
             if(blank($expectationPost)) {
-                if($pageKey == 2) {
-                    $uniqueStory = collect([
-                        [ 'id' => -2 ], /// Expectation video
-                    ]);
-                }
+                $uniqueStory = collect(
+                    [ 'id' => -2 ], /// Expectation video
+                );
             }else {
-                if($pageKey == 3) {
-                    $previousRelationshipPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "previousRelationship"])->first();
-                    if(blank($previousRelationshipPost)) {
-                        $uniqueStory = collect([
-                            [ 'id' => -3 ], /// Purpose video
-                        ]);
-                    }else {
-                        $careerPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "career"])->first();
-                        if(blank($careerPost)) {
-                            $uniqueStory = collect([
-                                ['id' => -4], /// Career video
-                            ]);
-                        }
+                $previousRelationshipPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "previousRelationship"])->first();
+                if(blank($previousRelationshipPost)) {
+                    $uniqueStory = collect(
+                        [ 'id' => -3 ], /// Purpose video
+                    );
+                }else {
+                    $careerPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "career"])->first();
+                    if(blank($careerPost)) {
+                        $uniqueStory = collect(
+                            ['id' => -4], /// Career video
+                        );
                     }
                 }
             }
