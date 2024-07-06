@@ -77,23 +77,23 @@ class StoryController extends Controller
             $preferredGender = json_decode($user->info->{'preferred_gender'});
             //eg.  [ any ] , ["women","men","transgenders","non_binary_or_non_conforming"]
             foreach ($preferredGender as $gender) {
-                if($gender == "women") {
-                    $preferredGenderOutput[] = "female";
+
+                if($gender == "any") {
+                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
+                }else {
+                    if($gender == "women") {
+                        $preferredGenderOutput[] = "female";
+                    }
+                    if($gender == "men") {
+                        $preferredGenderOutput[] = "male";
+                    }
+                    if($gender == "transgenders") {
+                        $preferredGenderOutput[] = "transgender";
+                    }
+                    if($gender == "non_binary_or_non_conforming") {
+                        $preferredGenderOutput[] = "non_binary_or_non_conforming";
+                    }
                 }
-                if($gender == "men") {
-                    $preferredGenderOutput[] = "male";
-                }
-                if($gender == "transgenders") {
-                    $preferredGenderOutput[] = "transgender";
-                }
-                if($gender == "non_binary_or_non_conforming") {
-                    $preferredGenderOutput[] = "non_binary_or_non_conforming";
-                }
-//            if($gender == "any") {
-//                $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
-//            }else {
-//
-//            }
             }
         }
 
@@ -183,9 +183,9 @@ class StoryController extends Controller
             ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge])
         ;
 
-//        if (!empty($preferredGenderOutput)) {
-//            $query->whereIn('user_infos.gender', $preferredGenderOutput);
-//        }
+        if (!empty($preferredGenderOutput)) {
+            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+        }
 //
 //        if (!empty($preferredRace)) {
 //            $query->whereIn('user_infos.race', $preferredRace);
