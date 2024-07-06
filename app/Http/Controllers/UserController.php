@@ -499,6 +499,7 @@ class UserController extends Controller
                 $join->on('users.id', '=', 'b2.initiator_id')
                     ->where('b2.offender_id', '=', $userId);
             })
+            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
             ->whereNull('b1.id')
             ->whereNull('b2.id')
             ->where('users.id', '!=', $userId)
