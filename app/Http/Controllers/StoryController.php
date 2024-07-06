@@ -301,16 +301,17 @@ class StoryController extends Controller
 //        }
 
         // Create a new paginator with the modified stories collection
-        $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
-            $storiesCollection,
-            $storiesCollection->count(),
-            $stories->perPage(),
-            $stories->currentPage(),
-            ['path' => $stories->path()]
-        );
+//        $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
+//            $storiesCollection,
+//            $storiesCollection->count(),
+//            $stories->perPage(),
+//            $stories->currentPage(),
+//            ['path' => $stories->path()]
+//        );
 
 
-        return response()->json(ApiResponse::successResponseWithData($modifiedStories));
+//        return response()->json(ApiResponse::successResponseWithData($modifiedStories));
+        return response()->json(ApiResponse::successResponseWithData($updatedItems));
     }
 
     public function fetchUserPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
