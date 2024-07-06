@@ -32,7 +32,7 @@ class ChatController extends Controller
     {
         $authUser = $request->user();
 
-        $userId = $request->user()->id;
+        $userId = $authUser->id;
 
         // Fetch the IDs of users blocked by the authenticated user
         $blockedUserIds = UserBlock::where('initiator_id', $userId)->pluck('offender_id');

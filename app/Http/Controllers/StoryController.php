@@ -68,6 +68,7 @@ class StoryController extends Controller
 //            ])
 //            ->where('media_path', '!=', "");
 
+        // apply user's personalization
 
         /// Preferences
         // Get preferred gender
@@ -137,26 +138,48 @@ class StoryController extends Controller
         }
 
 
-        // apply user's personalization
-        // limit by the country
-
-        // Check if user has viewed story before ----------------
-
         // Fetch stories with users' age between minAge and maxAge
         // Build the filtered query with joins and initial filters
 
+//        $query = Story::with(['user.info'])
+//            ->leftJoin('story_views', function ($join) use ($userId) {
+//                $join->on('stories.id', '=', 'story_views.story_id')
+//                    ->where('story_views.user_id', '=', $userId);
+//            })
+//            ->where('story_views.user_id', '=', null)
+//            ->where('stories.user_id', '!=', $user->id)
+//            ->whereNull('stories.deleted_at')
+//            ->whereNull('stories.disciplinary_action')
+//            ->where('stories.media_path', '!=', '')
+//            ->join('users', 'stories.user_id', '=', 'users.id')
+//            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+//            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
+
+        // Build the filtered query with joins and initial filters
+        // Build the filtered query with joins and initial filters
         $query = Story::with(['user.info'])
             ->leftJoin('story_views', function ($join) use ($userId) {
                 $join->on('stories.id', '=', 'story_views.story_id')
                     ->where('story_views.user_id', '=', $userId);
             })
-            ->where('story_views.user_id', '=', null)
-            ->where('stories.user_id', '!=', $user->id)
-            ->whereNull('stories.deleted_at')
-            ->whereNull('stories.disciplinary_action')
-            ->where('stories.media_path', '!=', '')
+            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
+                $join->on('stories.user_id', '=', 'b1.offender_id')
+                    ->where('b1.initiator_id', '=', $userId);
+            })
+            ->leftJoin('user_blocks as b2', function ($join) use ($userId) {
+                $join->on('stories.user_id', '=', 'b2.initiator_id')
+                    ->where('b2.offender_id', '=', $userId);
+            })
             ->join('users', 'stories.user_id', '=', 'users.id')
             ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+            ->whereNull('story_views.user_id')
+            ->whereNull('b1.id')
+            ->whereNull('b2.id')
+            ->where('stories.user_id', '!=', $userId)
+            ->whereNull('stories.deleted_at') // Exclude deleted stories
+            ->whereNull('stories.disciplinary_action')
+            ->where('stories.media_path', '!=', '')
+            ->whereNull('users.banned_at') // Exclude banned users
             ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
 
         if (!empty($preferredGenderOutput)) {
@@ -178,19 +201,19 @@ class StoryController extends Controller
         $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
 
         // If the filtered query results are empty, fallback to retrieving all stories except those already viewed by the user
-        if ($stories->isEmpty()) {
-            $stories = Story::with(['user.info'])
-//                ->leftJoin('story_views', function ($join) use ($userId) {
-//                    $join->on('stories.id', '=', 'story_views.story_id')
-//                        ->where('story_views.user_id', '=', $userId);
-//                })
-//                ->where('story_views.user_id', '=', null)
-                ->where('stories.user_id', '!=', $user->id)
-                ->whereNull('stories.deleted_at')
-                ->whereNull('stories.disciplinary_action')
-                ->where('stories.media_path', '!=', '')
-                ->simplePaginate($request->get('limit') ?: 3);
-        }
+//        if ($stories->isEmpty()) {
+//            $stories = Story::with(['user.info'])
+////                ->leftJoin('story_views', function ($join) use ($userId) {
+////                    $join->on('stories.id', '=', 'story_views.story_id')
+////                        ->where('story_views.user_id', '=', $userId);
+////                })
+////                ->where('story_views.user_id', '=', null)
+//                ->where('stories.user_id', '!=', $user->id)
+//                ->whereNull('stories.deleted_at')
+//                ->whereNull('stories.disciplinary_action')
+//                ->where('stories.media_path', '!=', '')
+//                ->simplePaginate($request->get('limit') ?: 3);
+//        }
 
 
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
