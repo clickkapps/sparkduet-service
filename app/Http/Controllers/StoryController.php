@@ -238,46 +238,43 @@ class StoryController extends Controller
 
         $updatedItems = $this->setAdditionalFeedParameters($request, $stories);
 
-        $merged = $updatedItems->getCollection();
+        // Convert the stories pagination object to a collection
+        $storiesCollection = collect($updatedItems->items());
 
         $pageKey = $request->get('page');
         Log::info("page=".$pageKey);
 
+        // Create the unique collection and prepend it to the stories collection
+        $uniqueStory = collect([
+            ['id' => -5], /// Introductory video
+        ]);
+
         $introductoryPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "introduction"])->first();
         if(blank($introductoryPost)) {
             if($pageKey == 1) {
-                $merged = $updatedItems->concat([
-                    [ 'id' => -1 ], /// Introductory video
-                ]);
+                $uniqueStory = collect([ 'id' => -1 ]);
             }
         }else {
             $expectationPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "expectations"])->first();
             if(blank($expectationPost)) {
                 if($pageKey == 2) {
-                    $merged = $updatedItems->concat([
-                        [ 'id' => -2 ], /// Introductory video
+                    $uniqueStory = collect([
+                        [ 'id' => -2 ], /// Expectation video
                     ]);
                 }
             }else {
                 if($pageKey == 3) {
                     $previousRelationshipPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "previousRelationship"])->first();
                     if(blank($previousRelationshipPost)) {
-                        $merged = $updatedItems->concat([
-                            [ 'id' => -3 ], /// Introductory video
+                        $uniqueStory = collect([
+                            [ 'id' => -3 ], /// Purpose video
                         ]);
                     }else {
                         $careerPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
                         if(blank($careerPost)) {
-                            $merged = $updatedItems->concat([
-                                ['id' => -4], /// Introductory video
+                            $uniqueStory = collect([
+                                ['id' => -4], /// Career video
                             ]);
-                        }else {
-                            $otherPost = Story::with([])->where(["user_id" =>  $user->id, "purpose" => "career"])->first();
-                            if(blank($otherPost)) {
-                                $merged = $updatedItems->concat([
-                                    ['id' => -5], /// Introductory video
-                                ]);
-                            }
                         }
                     }
                 }
@@ -300,10 +297,19 @@ class StoryController extends Controller
 //
 //        }
 
-        $stories->setCollection($merged);
+        $storiesCollection->prepend($uniqueStory);
+
+        // Create a new paginator with the modified stories collection
+        $modifiedStories = new \Illuminate\Pagination\LengthAwarePaginator(
+            $storiesCollection,
+            $stories->total(),
+            $stories->perPage(),
+            $stories->currentPage(),
+            ['path' => $stories->path()]
+        );
 
 
-        return response()->json(ApiResponse::successResponseWithData($stories));
+        return response()->json(ApiResponse::successResponseWithData($modifiedStories));
     }
 
     public function fetchUserPosts(Request $request, $userId) : \Illuminate\Http\JsonResponse {
