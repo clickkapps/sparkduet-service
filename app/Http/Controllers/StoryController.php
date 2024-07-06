@@ -184,6 +184,7 @@ class StoryController extends Controller
             ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge])
         ;
 
+        Log::info('preferredGenderOutput: ' . json_encode($preferredGenderOutput));
         if (!empty($preferredGenderOutput)) {
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
