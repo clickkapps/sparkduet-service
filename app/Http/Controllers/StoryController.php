@@ -76,10 +76,11 @@ class StoryController extends Controller
         if(!blank($user->info->{'preferred_gender'})) {
             $preferredGender = json_decode($user->info->{'preferred_gender'});
             //eg.  [ any ] , ["women","men","transgenders","non_binary_or_non_conforming"]
+            Log::info("preferred_genders: " . $user->info->{'preferred_gender'});
             foreach ($preferredGender as $gender) {
 
                 if($gender == "any") {
-                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming", ""];
+//                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
                 }else {
                     if($gender == "women") {
                         $preferredGenderOutput[] = "female";
