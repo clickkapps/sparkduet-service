@@ -183,20 +183,20 @@ class StoryController extends Controller
 //            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
         ;
 
-        if (!empty($preferredGenderOutput)) {
-            $query->whereIn('user_infos.gender', $preferredGenderOutput);
-        }
-
-        if (!empty($preferredRace)) {
-            $query->whereIn('user_infos.race', $preferredRace);
-        }
-
-        // Apply nationality filters based on the presence of included or excluded nationalities
-        if (!empty($includedNationalities)) {
-            $query->whereIn('user_infos.country', $includedNationalities);
-        } elseif (!empty($excludedNationalities)) {
-            $query->whereNotIn('user_infos.country', $excludedNationalities);
-        }
+//        if (!empty($preferredGenderOutput)) {
+//            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+//        }
+//
+//        if (!empty($preferredRace)) {
+//            $query->whereIn('user_infos.race', $preferredRace);
+//        }
+//
+//        // Apply nationality filters based on the presence of included or excluded nationalities
+//        if (!empty($includedNationalities)) {
+//            $query->whereIn('user_infos.country', $includedNationalities);
+//        } elseif (!empty($excludedNationalities)) {
+//            $query->whereNotIn('user_infos.country', $excludedNationalities);
+//        }
 
         // Select only the stories columns and paginate
         $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
