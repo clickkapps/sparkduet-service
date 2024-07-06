@@ -105,6 +105,7 @@ class StoryController extends Controller
         // Get preferred races
         $preferredRacesOutput = [];
         if(!blank($user->info->{'preferred_races'})) {
+            Log::info('preferred_races: ' . $user->info->{'preferred_races'});
             $preferredRaces = json_decode($user->info->{'preferred_races'});
             foreach ($preferredRaces as $race) {
 //            if($race == "other") {
@@ -189,6 +190,7 @@ class StoryController extends Controller
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
 //
+        Log::info('$preferredRacesOutput: ' . json_encode($preferredRacesOutput));
         if (!empty($preferredRacesOutput)) {
             $query->whereIn('user_infos.race', $preferredRacesOutput);
         }else{
