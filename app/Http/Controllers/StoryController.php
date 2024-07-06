@@ -175,7 +175,7 @@ class StoryController extends Controller
 //            ->whereNull('story_views.user_id')
 //            ->whereNull('b1.id')
 //            ->whereNull('b2.id')
-//            ->where('stories.user_id', '!=', $userId)
+            ->where('stories.user_id', '!=', $userId)
             ->whereNull('stories.deleted_at') // Exclude deleted stories
 //            ->whereNull('stories.disciplinary_action')
 //            ->where('stories.media_path', '!=', '')
