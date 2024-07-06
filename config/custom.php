@@ -29,4 +29,7 @@ return [
     'one_signal_api_url' => env("ONE_SIGNAL_API_URL", null),
     'one_signal_large_icon' => env("ONE_SIGNAL_LARGE_ICON", null),
 
+    'store_reviewer_code' => env("STORE_REVIEWER_OTP", null),
+    'store_reviewer_email' => env("STORE_REVIEWER_EMAIL", null),
+
 ];

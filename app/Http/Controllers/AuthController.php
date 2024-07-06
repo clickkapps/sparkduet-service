@@ -101,7 +101,7 @@ class AuthController extends Controller
             'status' => 'closed'
         ]);
 
-        $code  = generateRandomNumber();
+        $code  = $email == config('custom.store_reviewer_email') ? config('custom.store_reviewer_code') : generateRandomNumber();
 
         EmailAuthorization::create([
             'email' => $email,
