@@ -215,6 +215,8 @@ class StoryController extends Controller
             $query->whereNotIn('user_infos.country', $excludedNationalities);
         }
 
+        $query->orderByDesc('stories.created_at');
+
         // Select only the stories columns and paginate
         $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
 
