@@ -110,7 +110,7 @@ class StoryController extends Controller
 //            if($race == "other") {
 //                $preferredRacesOutput = [];
 //            }
-                if($race != "any" && $race != "other") {
+                if($race != "any") {
                     $preferredRacesOutput[] = $race;
                 }
             }
@@ -191,6 +191,11 @@ class StoryController extends Controller
 //
         if (!empty($preferredRacesOutput)) {
             $query->whereIn('user_infos.race', $preferredRacesOutput);
+        }else{
+            $query->where(function ($q){
+                $q->whereNull('user_infos.race')
+                    ->orWhere('user_infos.race', '=', 'other');
+            });
         }
 
 //        // Apply nationality filters based on the presence of included or excluded nationalities
