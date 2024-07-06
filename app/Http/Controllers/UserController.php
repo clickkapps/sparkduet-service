@@ -385,7 +385,7 @@ class UserController extends Controller
         }
         $user = User::with(['info'])->find($userId);
 
-        $onlineIds = $this->getUserOnlineIds();
+        $onlineIds = $this->getUserOnlineIds($request);
         event(new UserOnlineStatusChanged(ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
@@ -402,7 +402,7 @@ class UserController extends Controller
             UserOnline::with([])->create(['user_id' => $userId, 'status' => 'offline']);
         }
 
-        $onlineIds = $this->getUserOnlineIds();
+        $onlineIds = $this->getUserOnlineIds($request);
         event(new UserOnlineStatusChanged(ids:  $onlineIds));
         return response()->json(ApiResponse::successResponse());
     }
@@ -411,20 +411,117 @@ class UserController extends Controller
     {
         $user = $request->user();
         $limit = $request->get("limit") ?: 15;
-        $users = UserOnline::with(['user'])
-            ->where('user_id', '!=', $user->{'id'}) // except this user
-            ->where('status', '=', 'online')
+//        $users = UserOnline::with(['user'])
+//            ->where('user_id', '!=', $user->{'id'}) // except this user
+//            ->where('status', '=', 'online')
+//            ->orderByDesc('created_at')->simplePaginate($limit);
+        $users = $this->getUsersOnlineQuery($request)
             ->orderByDesc('created_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
-    private function getUserOnlineIds(): \Illuminate\Support\Collection {
-        return UserOnline::with([])->where('status', '=', 'online')->pluck('user_id');
+    private function getUserOnlineIds(Request $request): \Illuminate\Support\Collection {
+//        return UserOnline::with([])->where('status', '=', 'online')->pluck('user_id');
+        return $this->getUsersOnlineQuery($request)->pluck('user_onlines.user_id');
     }
 
     public function getUserIdsOnline(Request $request): JsonResponse {
-        $usersOnline = $this->getUserOnlineIds();
+        $usersOnline = $this->getUserOnlineIds($request);
         return response()->json(ApiResponse::successResponseWithData($usersOnline));
+    }
+
+    private function getUsersOnlineQuery(Request $request): \Illuminate\Database\Eloquent\Builder {
+
+        $user = $request->user();
+        $userId = $user->{'id'};
+
+        /// Preferences  --------------------
+
+        // Get preferred gender
+        $preferredGenderOutput = [];
+        if(!blank($user->info->{'preferred_gender'})) {
+            $preferredGender = json_decode($user->info->{'preferred_gender'});
+            //eg.  [ any ] , ["women","men","transgenders","non_binary_or_non_conforming"]
+            Log::info("preferred_genders: " . $user->info->{'preferred_gender'});
+            foreach ($preferredGender as $gender) {
+
+                if($gender == "any") {
+//                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
+                }else {
+                    if($gender == "women") {
+                        $preferredGenderOutput[] = "female";
+                    }
+                    if($gender == "men") {
+                        $preferredGenderOutput[] = "male";
+                    }
+                    if($gender == "transgenders") {
+                        $preferredGenderOutput[] = "transgender";
+                    }
+                    if($gender == "non_binary_or_non_conforming") {
+                        $preferredGenderOutput[] = "non_binary_or_non_conforming";
+                    }
+                }
+            }
+        }
+
+        // Get preferred nationalities
+        $includedNationalities = [];
+        $excludedNationalities = [];
+        if(!blank($user->info->{'preferred_nationalities'})) {
+            Log::info('preferred_nationalities: ' . $user->info->{'preferred_nationalities'});
+            $preferredNationalities = json_decode($user->info->{'preferred_nationalities'}, true);
+            //eg. {"key":"only","values":["GH"]}
+            $key = $preferredNationalities['key'];
+            $values = $preferredNationalities['values'];
+            if($key == 'only') {
+                foreach ($values as $value) {
+                    $includedNationalities[] = $value;
+                }
+            }
+            if($key == 'except') {
+                foreach ($values as $value) {
+                    $excludedNationalities[] = $value;
+                }
+            }
+
+        }
+
+        /// -------------------------
+
+        // Build the filtered query with joins and initial filters
+        $query = User::with(['info'])
+            ->leftJoin('user_onlines', 'users.id', '=', 'user_onlines.user_id')
+            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b1.offender_id')
+                    ->where('b1.initiator_id', '=', $userId);
+            })
+            ->leftJoin('user_blocks as b2', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b2.initiator_id')
+                    ->where('b2.offender_id', '=', $userId);
+            })
+            ->whereNull('b1.id')
+            ->whereNull('b2.id')
+            ->where('users.id', '!=', $userId)
+            ->whereNull('users.banned_at') // Exclude banned users
+            ->where('user_onlines.status', 'online'); // Filter for online users
+
+        if (!empty($preferredGenderOutput)) {
+            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+        }
+
+        // Apply nationality filters based on the presence of included or excluded nationalities
+        if (!empty($includedNationalities)) {
+            $query->whereIn('user_infos.country', $includedNationalities);
+        } elseif (!empty($excludedNationalities)) {
+            $query->whereNotIn('user_infos.country', $excludedNationalities);
+        }
+
+        return $query;
+
+//        // Select users and paginate
+//        $users = $query->select('users.*')->simplePaginate($request->get('limit') ?: 10);
+//
+//        return $users;
     }
 
 }
