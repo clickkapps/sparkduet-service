@@ -114,6 +114,8 @@ class StoryController extends Controller
                 if($race != "any") {
                     $preferredRacesOutput[] = $race;
                 }
+                $preferredRacesOutput[] = "other";
+
             }
         }
         // eg. ["white","hispanic_latino_or_spanish_origin","middle_eastern_or_north_african","native_hawaiian_or_other_pacific_islander","black_or_african_american","asian"]
@@ -192,12 +194,15 @@ class StoryController extends Controller
 //
         Log::info('$preferredRacesOutput: ' . json_encode($preferredRacesOutput));
         if (!empty($preferredRacesOutput)) {
-            $query->whereIn('user_infos.race', $preferredRacesOutput);
-        }else{
-            $query->where(function ($q){
-                $q->whereNull('user_infos.race')
-                    ->orWhere('user_infos.race', '=', 'other');
-            });
+            if(count($preferredGenderOutput) == 1) {
+                // only ["other"]
+                $query->where(function ($q){
+                    $q->whereNull('user_infos.race')
+                        ->orWhere('user_infos.race', '=', 'other');
+                });
+            }else {
+                $query->whereIn('user_infos.race', $preferredRacesOutput);
+            }
         }
 
 //        // Apply nationality filters based on the presence of included or excluded nationalities
