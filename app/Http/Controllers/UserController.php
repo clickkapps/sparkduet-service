@@ -416,7 +416,7 @@ class UserController extends Controller
 //            ->where('status', '=', 'online')
 //            ->orderByDesc('created_at')->simplePaginate($limit);
         $users = $this->getUsersOnlineQuery($request)
-            ->orderByDesc('created_at')->simplePaginate($limit);
+            ->orderByDesc('user_onlines.updated_at')->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
