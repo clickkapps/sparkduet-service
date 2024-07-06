@@ -218,7 +218,9 @@ class StoryController extends Controller
         $query->orderByDesc('stories.created_at');
 
         // Select only the stories columns and paginate
-        $stories = $query->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
+        $stories = $query
+            ->distinct('stories.id')
+            ->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
 
         // If the filtered query results are empty, fallback to retrieving all stories except those already viewed by the user
 //        if ($stories->isEmpty()) {
