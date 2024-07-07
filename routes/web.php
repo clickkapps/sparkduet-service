@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
 //    return phpinfo();
+    $url = "https://sparkduet.com";
+    return redirect()->away($url);
 });
 
 /*
