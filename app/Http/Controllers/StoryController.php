@@ -205,15 +205,20 @@ class StoryController extends Controller
 //
         Log::info('$preferredRacesOutput: ' . json_encode($preferredRacesOutput));
         if (!empty($preferredRacesOutput)) {
-            if(count($preferredGenderOutput) == 1) {
-                // only ["other"]
-                $query->where(function ($q){
-                    $q->whereNull('user_infos.race')
-                        ->orWhere('user_infos.race', '=', 'other');
-                });
-            }else {
+
+            if(count($preferredGenderOutput) > 1) {
                 $query->whereIn('user_infos.race', $preferredRacesOutput);
             }
+//            if(count($preferredGenderOutput) == 1) {
+//                // only ["other"]
+////                $query->where(function ($q){
+////                    $q->whereNull('user_infos.race')
+////                        ->orWhere('user_infos.race', '=', 'other')
+////                        ->orWhereIn('user_infos.race', ['men', '']);
+////                });
+//            }else {
+//                $query->whereIn('user_infos.race', $preferredRacesOutput);
+//            }
         }
         $clonedStoryIds = (clone $query)->pluck('stories.id');
         Log::info('.......... Test Case After Races .................');
