@@ -185,8 +185,13 @@ class StoryController extends Controller
             ->whereNull('stories.disciplinary_action')
             ->where('stories.media_path', '!=', '')
             ->whereNull('users.banned_at') // Exclude banned users
-            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge])
-        ;
+            ->whereBetween('user_infos.age', [$preferredMinAge, $preferredMaxAge]);
+
+        $clonedStoryIds = (clone $query)->pluck('stories.id');
+        Log::info('.......... Test Case .................');
+        Log::info('CustomLog: CurrentUser Id' . $userId );
+        Log::info('CustomLog: Stories fetched' . json_encode($clonedStoryIds) );
+        Log::info('.......... End of Test Case .................');
 
         Log::info('preferredGenderOutput: ' . json_encode($preferredGenderOutput));
         if (!empty($preferredGenderOutput)) {
