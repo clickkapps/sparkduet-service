@@ -197,6 +197,11 @@ class StoryController extends Controller
         if (!empty($preferredGenderOutput)) {
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
+
+        $clonedStoryIds = (clone $query)->pluck('stories.id');
+        Log::info('.......... Test Case After Gender .................');
+        Log::info('CustomLog: Stories' . json_encode($clonedStoryIds) );
+        Log::info('.......... End of Test Case .................');
 //
         Log::info('$preferredRacesOutput: ' . json_encode($preferredRacesOutput));
         if (!empty($preferredRacesOutput)) {
@@ -210,6 +215,11 @@ class StoryController extends Controller
                 $query->whereIn('user_infos.race', $preferredRacesOutput);
             }
         }
+        $clonedStoryIds = (clone $query)->pluck('stories.id');
+        Log::info('.......... Test Case After Races .................');
+        Log::info('CustomLog: Stories' . json_encode($clonedStoryIds) );
+        Log::info('.......... End of Test Case .................');
+
 
         Log::info('$includedNationalities: ' . json_encode($includedNationalities));
         Log::info('$excludedNationalities: ' . json_encode($excludedNationalities));
@@ -219,6 +229,11 @@ class StoryController extends Controller
         } elseif (!empty($excludedNationalities)) {
             $query->whereNotIn('user_infos.country', $excludedNationalities);
         }
+
+        $clonedStoryIds = (clone $query)->pluck('stories.id');
+        Log::info('.......... Test Case After Nationalities .................');
+        Log::info('CustomLog: Stories' . json_encode($clonedStoryIds) );
+        Log::info('.......... End of Test Case .................');
 
         $query->orderByDesc('stories.created_at');
 
