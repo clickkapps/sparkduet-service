@@ -154,4 +154,99 @@ trait UserTrait
             Log::error($exception->getMessage());
         }
     }
+
+
+    protected function getUsersOnlineQuery($userId): \Illuminate\Database\Eloquent\Builder {
+
+        $user = User::with(['info'])->find($userId);
+
+        /// Preferences  --------------------
+
+        // Get preferred gender
+        $preferredGenderOutput = [];
+        if(!blank($user->{'info'}->{'preferred_gender'})) {
+            $preferredGender = json_decode($user->{'info'}->{'preferred_gender'});
+            //eg.  [ any ] , ["women","men","transgenders","non_binary_or_non_conforming"]
+            Log::info("preferred_genders: " . $user->{'info'}->{'preferred_gender'});
+            foreach ($preferredGender as $gender) {
+
+                if($gender == "any") {
+//                    $preferredGenderOutput = ["female","male","transgender","non_binary_or_non_conforming"];
+                }else {
+                    if($gender == "women") {
+                        $preferredGenderOutput[] = "female";
+                    }
+                    if($gender == "men") {
+                        $preferredGenderOutput[] = "male";
+                    }
+                    if($gender == "transgenders") {
+                        $preferredGenderOutput[] = "transgender";
+                    }
+                    if($gender == "non_binary_or_non_conforming") {
+                        $preferredGenderOutput[] = "non_binary_or_non_conforming";
+                    }
+                }
+            }
+        }
+
+        // Get preferred nationalities
+        $includedNationalities = [];
+        $excludedNationalities = [];
+        if(!blank($user->{'info'}->{'preferred_nationalities'})) {
+            Log::info('preferred_nationalities: ' . $user->{'info'}->{'preferred_nationalities'});
+            $preferredNationalities = json_decode($user->{'info'}->{'preferred_nationalities'}, true);
+            //eg. {"key":"only","values":["GH"]}
+            $key = $preferredNationalities['key'];
+            $values = $preferredNationalities['values'];
+            if($key == 'only') {
+                foreach ($values as $value) {
+                    $includedNationalities[] = $value;
+                }
+            }
+            if($key == 'except') {
+                foreach ($values as $value) {
+                    $excludedNationalities[] = $value;
+                }
+            }
+
+        }
+
+        /// -------------------------
+
+        // Build the filtered query with joins and initial filters
+        $query = User::with(['info'])
+            ->leftJoin('user_onlines', 'users.id', '=', 'user_onlines.user_id')
+            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b1.offender_id')
+                    ->where('b1.initiator_id', '=', $userId);
+            })
+            ->leftJoin('user_blocks as b2', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b2.initiator_id')
+                    ->where('b2.offender_id', '=', $userId);
+            })
+            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+            ->whereNull('b1.id')
+            ->whereNull('b2.id')
+            ->where('users.id', '!=', $userId)
+            ->whereNull('users.banned_at') // Exclude banned users
+            ->where('user_onlines.status', 'online'); // Filter for online users
+
+        if (!empty($preferredGenderOutput)) {
+            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+        }
+
+        // Apply nationality filters based on the presence of included or excluded nationalities
+        if (!empty($includedNationalities)) {
+            $query->whereIn('user_infos.country', $includedNationalities);
+        } elseif (!empty($excludedNationalities)) {
+            $query->whereNotIn('user_infos.country', $excludedNationalities);
+        }
+
+        return $query;
+
+//        // Select users and paginate
+//        $users = $query->select('users.*')->simplePaginate($request->get('limit') ?: 10);
+//
+//        return $users;
+    }
 }

@@ -19,7 +19,7 @@ class UserOnlineStatusChanged implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $ids)
+    public function __construct(public $ids, private $userId)
     {
         //
     }
@@ -31,6 +31,6 @@ class UserOnlineStatusChanged implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('user.online.status-changed');
+        return new Channel('users.'.$this->userId.'.online-users.status-changed');
     }
 }
