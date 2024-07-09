@@ -271,8 +271,11 @@ class StoryController extends Controller
         $pageKey = $request->get('page');
         Log::info("page=".$pageKey);
 
+        $uniqueStory = null;
         // Create the unique collection and prepend it to the stories collection
-        $uniqueStory = collect(['id' => -5]); // Encourage users to creat post about anything on their mind
+        if($pageKey == 1) {
+            $uniqueStory = collect(['id' => -5]);
+        } // Encourage users to creat post about anything on their mind
 
         $introductoryPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "introduction"])->first();
 
@@ -282,28 +285,28 @@ class StoryController extends Controller
                 $introductoryPostAdded = true;
         }
 
-        if(!$introductoryPostAdded) {
-            $expectationPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "expectations"])->first();
-            if(blank($expectationPost)) {
-                $uniqueStory = collect(
-                    [ 'id' => -2 ], /// Expectation video
-                );
-            }else {
-                $previousRelationshipPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "previousRelationship"])->first();
-                if(blank($previousRelationshipPost)) {
-                    $uniqueStory = collect(
-                        [ 'id' => -3 ], /// Purpose video
-                    );
-                }else {
-                    $careerPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "career"])->first();
-                    if(blank($careerPost)) {
-                        $uniqueStory = collect(
-                            ['id' => -4], /// Career video
-                        );
-                    }
-                }
-            }
-        }
+//        if(!$introductoryPostAdded) {
+//            $expectationPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "expectations"])->first();
+//            if(blank($expectationPost)) {
+//                $uniqueStory = collect(
+//                    [ 'id' => -2 ], /// Expectation video
+//                );
+//            }else {
+//                $previousRelationshipPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "previousRelationship"])->first();
+//                if(blank($previousRelationshipPost)) {
+//                    $uniqueStory = collect(
+//                        [ 'id' => -3 ], /// Purpose video
+//                    );
+//                }else {
+//                    $careerPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "career"])->first();
+//                    if(blank($careerPost)) {
+//                        $uniqueStory = collect(
+//                            ['id' => -4], /// Career video
+//                        );
+//                    }
+//                }
+//            }
+//        }
 //        if($updatedItems->isEmpty()) {
 //
 //            /// This prompts the user to create post
@@ -321,10 +324,12 @@ class StoryController extends Controller
 //        }
 
         // Conditionally insert the unique story into the first or second position
-        if ($storiesCollection->count() > 1) {
-            $storiesCollection->splice(1, 0, [$uniqueStory]);
-        } else {
-            $storiesCollection->prepend($uniqueStory);
+        if($uniqueStory) {
+            if ($storiesCollection->count() > 1) {
+                $storiesCollection->splice(1, 0, [$uniqueStory]);
+            } else {
+                $storiesCollection->prepend($uniqueStory);
+            }
         }
 
         // Create a new paginator with the modified stories collection
