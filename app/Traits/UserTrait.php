@@ -216,32 +216,32 @@ trait UserTrait
         // Build the filtered query with joins and initial filters
         $query = User::with(['info'])
             ->leftJoin('user_onlines', 'users.id', '=', 'user_onlines.user_id')
-//            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
-//                $join->on('users.id', '=', 'b1.offender_id')
-//                    ->where('b1.initiator_id', '=', $userId);
-//            })
-//            ->leftJoin('user_blocks as b2', function ($join) use ($userId) {
-//                $join->on('users.id', '=', 'b2.initiator_id')
-//                    ->where('b2.offender_id', '=', $userId);
-//            })
-//            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
-//            ->whereNull('b1.id')
-//            ->whereNull('b2.id')
+            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b1.offender_id')
+                    ->where('b1.initiator_id', '=', $userId);
+            })
+            ->leftJoin('user_blocks as b2', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'b2.initiator_id')
+                    ->where('b2.offender_id', '=', $userId);
+            })
+            ->join('user_infos', 'users.id', '=', 'user_infos.user_id')
+            ->whereNull('b1.id')
+            ->whereNull('b2.id')
             ->where('users.id', '!=', $userId)
 //            ->whereNull('users.banned_at') // Exclude banned users
             ->where('user_onlines.status', 'online')
         ; // Filter for online users
 
-//        if (!empty($preferredGenderOutput)) {
-//            $query->whereIn('user_infos.gender', $preferredGenderOutput);
-//        }
-//
-//        // Apply nationality filters based on the presence of included or excluded nationalities
-//        if (!empty($includedNationalities)) {
-//            $query->whereIn('user_infos.country', $includedNationalities);
-//        } elseif (!empty($excludedNationalities)) {
-//            $query->whereNotIn('user_infos.country', $excludedNationalities);
-//        }
+        if (!empty($preferredGenderOutput)) {
+            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+        }
+
+        // Apply nationality filters based on the presence of included or excluded nationalities
+        if (!empty($includedNationalities)) {
+            $query->whereIn('user_infos.country', $includedNationalities);
+        } elseif (!empty($excludedNationalities)) {
+            $query->whereNotIn('user_infos.country', $excludedNationalities);
+        }
 
         return $query
             ->distinct('users.id')
