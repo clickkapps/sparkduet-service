@@ -228,6 +228,7 @@ trait UserTrait
             ->whereNull('b1.id')
             ->whereNull('b2.id')
             ->where('users.id', '!=', $userId)
+            ->whereNotIn('users.id', [14, 15]) // these are the store reviewers ids
 //            ->whereNull('users.banned_at') // Exclude banned users
             ->where('user_onlines.status', 'online')
         ; // Filter for online users
