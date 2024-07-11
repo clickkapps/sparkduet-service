@@ -631,7 +631,7 @@ class StoryController extends Controller
     public function deleteStory($id): \Illuminate\Http\JsonResponse {
 
         $story = Story::with([])->find($id);
-        $story->update(['deleted_at' => now()]);
+        $story?->update(['deleted_at' => now()]);
 
         return response()->json(ApiResponse::successResponse());
 
