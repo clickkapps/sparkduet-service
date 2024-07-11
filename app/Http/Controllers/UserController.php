@@ -419,7 +419,8 @@ class UserController extends Controller
 
 //            ->orderByDesc('created_at')->simplePaginate($limit);
         $users = $this->getUsersOnlineQuery($userId)
-            ->orderByDesc('user_onlines.updated_at')->simplePaginate($limit);
+//            ->orderByDesc('user_onlines.updated_at')
+            ->simplePaginate($limit);
         return response()->json(ApiResponse::successResponseWithData($users));
     }
 
