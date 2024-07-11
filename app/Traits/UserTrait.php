@@ -232,16 +232,16 @@ trait UserTrait
 //            ->where('user_onlines.status', 'online')
         ; // Filter for online users
 
-        if (!empty($preferredGenderOutput)) {
-            $query->whereIn('user_infos.gender', $preferredGenderOutput);
-        }
-
-        // Apply nationality filters based on the presence of included or excluded nationalities
-        if (!empty($includedNationalities)) {
-            $query->whereIn('user_infos.country', $includedNationalities);
-        } elseif (!empty($excludedNationalities)) {
-            $query->whereNotIn('user_infos.country', $excludedNationalities);
-        }
+//        if (!empty($preferredGenderOutput)) {
+//            $query->whereIn('user_infos.gender', $preferredGenderOutput);
+//        }
+//
+//        // Apply nationality filters based on the presence of included or excluded nationalities
+//        if (!empty($includedNationalities)) {
+//            $query->whereIn('user_infos.country', $includedNationalities);
+//        } elseif (!empty($excludedNationalities)) {
+//            $query->whereNotIn('user_infos.country', $excludedNationalities);
+//        }
 
         return $query;
 
