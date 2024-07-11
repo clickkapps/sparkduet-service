@@ -244,9 +244,9 @@ trait UserTrait
         }
 
         return $query
-            ->orderByDesc('user_onlines.updated_at')
             ->distinct('users.id')
-            ->select('users.*');
+            ->select('users.*', 'user_onlines.updated_at as online_updated_at')
+            ->orderByDesc('user_onlines.updated_at');
 
 //        // Select users and paginate
 //        $users = $query->select('users.*')->simplePaginate($request->get('limit') ?: 10);
