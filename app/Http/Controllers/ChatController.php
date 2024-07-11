@@ -114,8 +114,8 @@ class ChatController extends Controller
 
         // Take the first 10 users
         $relatedUsers = $relatedUsers->take(10);
-        $relatedUsers = collect($relatedUsers)->filter(function ($item) {
-            return ($item->{'id'} != '14' && $item->{'id'} != '15'); // this is for the app store accounts
+        $relatedUsers = collect($relatedUsers)->filter(function ($item) use ($userId) {
+            return ($item->{'id'} != '14' && $item->{'id'} != '15' && $item->{'id'} != $userId); // this is for the app store accounts
         })->values();
 
         return response()->json(ApiResponse::successResponseWithData($relatedUsers));
