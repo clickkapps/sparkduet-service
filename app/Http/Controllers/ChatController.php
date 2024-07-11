@@ -59,7 +59,7 @@ class ChatController extends Controller
                 $query->where('user_id', $userId);
             });
         })
-            ->whereNotIn('id', [14, 15]) // these are the store reviewers ids
+            ->whereNotIn('id', ['14', '15']) // these are the store reviewers ids
             ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
             ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
             ->with(['stories' => function ($query) use ($userId) {
