@@ -59,7 +59,6 @@ class ChatController extends Controller
                 $query->where('user_id', $userId);
             });
         })
-            ->whereNotIn('id', ['14', '15']) // these are the store reviewers ids
             ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
             ->whereNotIn('id', $conversationUserIds) // Exclude users with whom conversation has started
             ->with(['stories' => function ($query) use ($userId) {
@@ -115,6 +114,9 @@ class ChatController extends Controller
 
         // Take the first 10 users
         $relatedUsers = $relatedUsers->take(10);
+        $relatedUsers = collect($relatedUsers)->filter(function ($item) {
+            return ($item->{'id'} != '14' && $item->{'id'} != '15'); // this is for the app store accounts
+        });
 
         return response()->json(ApiResponse::successResponseWithData($relatedUsers));
     }
