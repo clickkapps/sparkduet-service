@@ -244,6 +244,7 @@ trait UserTrait
         }
 
         return $query
+            ->orderByDesc('user_onlines.updated_at')
             ->distinct('users.id')
             ->select('users.*');
 
