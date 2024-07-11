@@ -243,7 +243,9 @@ trait UserTrait
 //            $query->whereNotIn('user_infos.country', $excludedNationalities);
 //        }
 
-        return $query;
+        return $query
+            ->distinct('users.id')
+            ->select('users.*');
 
 //        // Select users and paginate
 //        $users = $query->select('users.*')->simplePaginate($request->get('limit') ?: 10);
