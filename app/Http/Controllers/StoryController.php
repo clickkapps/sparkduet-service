@@ -244,6 +244,7 @@ class StoryController extends Controller
 
         // Select only the stories columns and paginate
         $stories = $query
+            ->orderByDesc('user_onlines.updated_at')
             ->distinct('stories.id')
             ->select('stories.*')->simplePaginate($request->get('limit') ?: 3);
 
