@@ -215,7 +215,7 @@ trait UserTrait
 
         // Build the filtered query with joins and initial filters
         $query = User::with(['info'])
-//            ->leftJoin('user_onlines', 'users.id', '=', 'user_onlines.user_id')
+            ->leftJoin('user_onlines', 'users.id', '=', 'user_onlines.user_id')
 //            ->leftJoin('user_blocks as b1', function ($join) use ($userId) {
 //                $join->on('users.id', '=', 'b1.offender_id')
 //                    ->where('b1.initiator_id', '=', $userId);
@@ -229,7 +229,7 @@ trait UserTrait
 //            ->whereNull('b2.id')
             ->where('users.id', '!=', $userId)
 //            ->whereNull('users.banned_at') // Exclude banned users
-//            ->where('user_onlines.status', 'online')
+            ->where('user_onlines.status', 'online')
         ; // Filter for online users
 
 //        if (!empty($preferredGenderOutput)) {
