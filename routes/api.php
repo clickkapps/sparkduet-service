@@ -80,7 +80,7 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::get('get-chat-connection/{id}', [\App\Http\Controllers\ChatController::class, 'getChatConnectionById']);
     Route::post('send-message', [\App\Http\Controllers\ChatController::class, 'sendMessage']);
     Route::get('fetch-messages', [\App\Http\Controllers\ChatController::class, 'fetchMessages']);
-    Route::get('fetch-bulk-messages', [\App\Http\Controllers\ChatController::class, 'fetchBulkMessages']);
+    Route::post('fetch-bulk-messages', [\App\Http\Controllers\ChatController::class, 'fetchBulkMessages']);
     Route::post('delete-message', [\App\Http\Controllers\ChatController::class, 'deleteMessage']);
     Route::post('delete-connection', [\App\Http\Controllers\ChatController::class, 'deleteChatConnection']);
     Route::post('mark-messages-as-read', [\App\Http\Controllers\ChatController::class, 'markMessagesRead']);
