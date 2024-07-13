@@ -311,7 +311,26 @@ class ChatController extends Controller
         $messages = ChatMessage::with(['parent'])->where([
             'deleted_at' => null,
             'chat_connection_id' => $chatConnectionId
-        ])->orderByDesc('created_at')->simplePaginate($request->get("limit") ?: 15);
+        ])->orderByDesc('created_at')->get();
+        return response()->json(ApiResponse::successResponseWithData($messages));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function fetchBulkMessages(Request $request): \Illuminate\Http\JsonResponse {
+
+        $this->validate($request, [
+            'conn_ids' => 'required',
+        ]);
+
+        $connectionIds = $request->get('conn_ids');
+
+        $messages = ChatMessage::with(['parent'])->where([
+            'deleted_at' => null,
+        ])->whereIn('chat_connection_id', $connectionIds)
+            ->orderByDesc('created_at')->get();
+
         return response()->json(ApiResponse::successResponseWithData($messages));
     }
 
