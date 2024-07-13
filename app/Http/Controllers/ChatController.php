@@ -311,7 +311,9 @@ class ChatController extends Controller
         $messages = ChatMessage::with(['parent'])->where([
             'deleted_at' => null,
             'chat_connection_id' => $chatConnectionId
-        ])->orderByDesc('created_at')->get();
+        ])->orderByDesc('created_at')
+            ->get();
+//            ->simplePaginate($request->get("limit") ?: 15);
         return response()->json(ApiResponse::successResponseWithData($messages));
     }
 
@@ -324,13 +326,13 @@ class ChatController extends Controller
             'conn_ids' => 'required',
         ]);
 
-        $connectionIds = $request->get('conn_ids');
+        $connectionIds = json_decode($request->get('conn_ids'));
 
         $messages = ChatMessage::with(['parent'])->where([
             'deleted_at' => null,
-        ])->whereIn('chat_connection_id', $connectionIds)
+        ])
+            ->whereIn('chat_connection_id', $connectionIds)
             ->orderByDesc('created_at')->get();
-
         return response()->json(ApiResponse::successResponseWithData($messages));
     }
 
