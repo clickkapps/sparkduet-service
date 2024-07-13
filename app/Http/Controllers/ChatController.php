@@ -54,7 +54,7 @@ class ChatController extends Controller
             ->pluck('user_id');
 
         // Fetch the users (creators) of the stories that the authenticated user has liked, ordered by the most recent like
-        $likedStoryCreators = User::whereHas('stories', function ($query) use ($userId) {
+        $likedStoryCreators = User::with(['info'])->whereHas('stories', function ($query) use ($userId) {
             $query->whereHas('likes', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             });
@@ -69,7 +69,7 @@ class ChatController extends Controller
             ->get();
 
         // Fetch the users whose profiles have been viewed by the authenticated user, ordered by the most recent view
-        $viewedProfiles = User::whereHas('profileViews', function ($query) use ($userId) {
+        $viewedProfiles = User::with(['info'])->whereHas('profileViews', function ($query) use ($userId) {
             $query->where('viewer_id', $userId);
         })
             ->whereNotIn('id', $allBlockedUserIds) // Exclude blocked users
@@ -80,7 +80,7 @@ class ChatController extends Controller
             ->get();
 
         // Fetch the users whose stories have been viewed by the authenticated user, ordered by the most views
-        $viewedStoryUsers = User::whereHas('stories', function ($query) use ($userId) {
+        $viewedStoryUsers = User::with(['info'])->whereHas('stories', function ($query) use ($userId) {
             $query->whereHas('views', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             });
@@ -113,7 +113,7 @@ class ChatController extends Controller
         })->values();
 
         // Take the first 10 users
-        $relatedUsers = $relatedUsers->take(10);
+        $relatedUsers = $relatedUsers->take(15);
         $relatedUsers = collect($relatedUsers)->filter(function ($item) use ($userId) {
             return ($item->{'id'} != '14' && $item->{'id'} != '15' && $item->{'id'} != $userId); // this is for the app store accounts
         })->values();
@@ -216,7 +216,7 @@ class ChatController extends Controller
         $user = $request->user();
         $chatConnection = $user->chatConnections()->with([
             'participants' => function($query) {
-                $query->withPivot('unread_messages');
+                $query->withPivot('unread_messages')->with('info');
             },
             'lastMessage'
         ])
