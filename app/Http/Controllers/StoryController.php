@@ -277,7 +277,10 @@ class StoryController extends Controller
             $uniqueStory = collect(['id' => -5]);
         } // Encourage users to creat post about anything on their mind
 
-        $introductoryPost = Story::with([])->where(["user_id" =>  $userId, "purpose" => "introduction"])->first();
+        $introductoryPost = Story::with([])
+            ->where(["user_id" =>  $userId, "purpose" => "introduction"])
+            ->whereNull('deleted_at')
+            ->first();
 
         $introductoryPostAdded = false;
         if(blank($introductoryPost) && $pageKey == 1) {
