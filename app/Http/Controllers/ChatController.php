@@ -326,7 +326,7 @@ class ChatController extends Controller
             'conn_ids' => 'required',
         ]);
 
-        $connectionIds = json_decode($request->get('conn_ids'));
+        $connectionIds = $request->get('conn_ids');
 
         $messages = ChatMessage::with(['parent'])->where([
             'deleted_at' => null,
