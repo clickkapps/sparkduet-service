@@ -203,7 +203,7 @@ class ChatController extends Controller
         // Get chat connections along with participants
         $chatConnections = $user->chatConnections()
             ->whereNull('chat_connections.deleted_at')
-            ->with(['participants' => function($query) {
+            ->with(['participants.info' => function($query) {
                 $query->withPivot('unread_messages');
             }, 'lastMessage'])
             ->orderByDesc('updated_at')->simplePaginate($limit);
