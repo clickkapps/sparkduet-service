@@ -237,12 +237,19 @@ trait UserTrait
             $query->whereIn('user_infos.gender', $preferredGenderOutput);
         }
 
+        $query->whereNull('user_infos.country');
+
         // Apply nationality filters based on the presence of included or excluded nationalities
         if (!empty($includedNationalities)) {
             $query->whereIn('user_infos.country', $includedNationalities);
         } elseif (!empty($excludedNationalities)) {
             $query->whereNotIn('user_infos.country', $excludedNationalities);
         }
+//        if(empty($includedNationalities) && empty($excludedNationalities)) {
+//            // all
+//            ;
+//        }
+
 
         return $query
             ->distinct('users.id')
