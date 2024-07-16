@@ -240,7 +240,7 @@ class StoryController extends Controller
         Log::info('CustomLog: Stories' . json_encode($clonedStoryIds) );
         Log::info('.......... End of Test Case .................');
 
-        $query->orderByDesc('stories.created_at');
+//        $query->orderByDesc('stories.created_at');
 
         // Select only the stories columns and paginate
         $stories = $query
