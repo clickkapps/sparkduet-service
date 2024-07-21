@@ -240,6 +240,9 @@ class StoryController extends Controller
         Log::info('CustomLog: Stories' . json_encode($clonedStoryIds) );
         Log::info('.......... End of Test Case .................');
 
+        // Remove existing dating posts
+        $query->whereNotIn('stories.id', [94, 97, 106, 112, 113, 114, 148, 149]);
+
         $query->orderByDesc('stories.created_at');
 
         // Select only the stories columns and paginate
