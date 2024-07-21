@@ -307,7 +307,8 @@ class AuthController extends Controller
         $userInfo = UserInfo::with([])->firstOrCreate(
             ['user_id' => $user->{'id'}],
             [
-                'bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"
+//                'bio' => "Hey✋, I am on the lookout for a partner. Interested in exploring the journey of finding love together?"
+                'bio' => "Hello✋ Everyone! Looking forward to meeting new people 👋😎"
             ]
         );
 
