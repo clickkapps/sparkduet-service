@@ -10,7 +10,6 @@ use App\Models\StoryLike;
 use App\Models\StoryReport;
 use App\Models\StoryView;
 use App\Models\User;
-use App\Notifications\StoryReportCreated;
 use App\Traits\StoryTrait;
 use App\Traits\UserTrait;
 use Illuminate\Database\Query\Builder;
@@ -241,7 +240,7 @@ class StoryController extends Controller
         Log::info('.......... End of Test Case .................');
 
         // Remove existing dating posts
-        $query->whereNotIn('stories.id', [94, 97, 106, 112, 113, 114, 148, 149]);
+//        $query->whereNotIn('stories.id', [94, 97, 106, 112, 113, 114, 148, 149]);
 
         $query->orderByDesc('stories.created_at');
 
