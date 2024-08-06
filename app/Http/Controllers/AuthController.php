@@ -445,12 +445,18 @@ class AuthController extends Controller
 
         if(blank($user->info->{'preferred_nationalities'})) {
 
+//            $user->info()->update([
+//                'preferred_nationalities' => json_encode([
+//                    "key" => blank($countryCode) ? "all" : "only", //except / only / all
+//                    "values" => blank($countryCode) ? []: [
+//                        $countryCode
+//                    ] // country codes
+//                ]),
+//            ]);
             $user->info()->update([
                 'preferred_nationalities' => json_encode([
-                    "key" => blank($countryCode) ? "all" : "only", //except / only / all
-                    "values" => blank($countryCode) ? []: [
-                        $countryCode
-                    ] // country codes
+                    "key" =>  "all" , //except / only / all
+                    "values" =>  [] // country codes
                 ]),
             ]);
 
